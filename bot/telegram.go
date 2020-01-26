@@ -3,7 +3,7 @@ package bot
 import (
 	"log"
 
-	"house_search_assistant/configs"
+	"github.com/aastashov/house_search_assistant/configs"
 
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 )

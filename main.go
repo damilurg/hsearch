@@ -6,9 +6,9 @@ import (
 	"os"
 	"path"
 
-	"house_search_assistant/bot"
-	"house_search_assistant/configs"
-	"house_search_assistant/storage"
+	"github.com/aastashov/house_search_assistant/bot"
+	"github.com/aastashov/house_search_assistant/configs"
+	"github.com/aastashov/house_search_assistant/storage"
 
 	_ "github.com/joho/godotenv/autoload"
 )
