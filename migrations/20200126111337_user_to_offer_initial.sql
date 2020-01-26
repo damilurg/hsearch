@@ -7,7 +7,8 @@ create table user_to_offer
     -- sqlite не поддерживает boolean тип, по этому спользуется integer 1/0
     -- в других бд, boolean выглядит как tinyint, то есть 1/0, так что это норм
     like     integer default 0,
-    dislike  integer default 0
+    dislike  integer default 0,
+    skip     integer
 );
 
 create index user_to_offer_offer_id_index

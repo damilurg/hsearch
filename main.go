@@ -6,7 +6,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/aastashov/house_search_assistant/bot"
+	"github.com/aastashov/house_search_assistant/background"
+	"github.com/aastashov/house_search_assistant/bots"
 	"github.com/aastashov/house_search_assistant/configs"
 	"github.com/aastashov/house_search_assistant/storage"
 
@@ -14,16 +15,24 @@ import (
 )
 
 const (
-	BaseURL = "http://diesel.elcat.kg/index.php?showforum=305?page=%d"
-	// TODO: описать хелпер
+	BaseURL      = "http://diesel.elcat.kg/index.php?showforum=305?page=%d"
 	helpCommands = "[migrate|bgm]"
 )
 
-func main() {
-	// для отладки
-	// parser.TestSelector("http://diesel.elcat.kg/index.php?s=6f9a6608d3dc486d57391576b85ea17d&showtopic=292671275")
-	// return
+/* TODO: проблемы
+    1. протестировать ReadUsersForOrder
+    2. бот не понимает какие квартиры отправлял, а какие нет
+    3. менеджер так же спамит все
+    4. не реализовано skip
+    5. не реализовано images
+    6. не реализовано description
+    7. не реализовано like
+    8. не реализовано skip
+    9. описать helpCommands
+    10. пройтись по всем туду
+*/
 
+func main() {
 	cnf, err := configs.GetConf()
 	if err != nil {
 		log.Fatalln("[main.GetConf] error: ", err)
@@ -48,12 +57,8 @@ func main() {
 		return
 	}
 
-	// todo: NewBot должен принимать db для использования storage
-	telegramBot := bot.NewTelegramBot(cnf)
+	telegramBot := bots.NewTelegramBot(cnf, db)
+	go telegramBot.Start()
 
-	// todo: start должен запускаться в go routine
-	telegramBot.Start()
-
-	// todo: после запуска бота, запускаем менеджера, который будет искать
-	//  квартиры и рассылать через бота
+	background.StartOfferManager(BaseURL, cnf, db, telegramBot)
 }

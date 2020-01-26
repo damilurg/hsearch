@@ -1,13 +1,20 @@
-package parser
+package structs
 
-import "github.com/PuerkitoBio/goquery"
+import (
+	"log"
+	"net/url"
+	"strconv"
+
+	"github.com/PuerkitoBio/goquery"
+)
 
 type (
-	// todo: может стоит использовать структуру из пакета storage?!
-	// Offer - временная структура для хранения и парсинга объявления
+	// Offer - хранит все объявления c diesel
 	Offer struct {
+		Id         uint64
+		ExId       uint64
 		Url        string
-		Title      string
+		Topic      string
 		Price      string
 		Phone      string
 		RoomNumber string
@@ -24,6 +31,7 @@ func ParseNewOffer(href string, doc *goquery.Document) *Offer {
 		doc: doc,
 	}
 
+	offer.parseId(href)
 	offer.parseTitle()
 	offer.parsePrice()
 	offer.parsePhone()
@@ -33,10 +41,34 @@ func ParseNewOffer(href string, doc *goquery.Document) *Offer {
 	return offer
 }
 
+// parseId - достает Id из URL
+func (o *Offer) parseId(href string) uint64 {
+	urlPath, err := url.Parse(href)
+	if err != nil {
+		log.Println("[parseId.Parse] error:", err)
+		return 0
+	}
+
+	id := urlPath.Query().Get("showtopic")
+	if id == "" {
+		log.Println("[parseId.Get] id is empty")
+		return 0
+	}
+
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		log.Println("[parseId.Atoi] error:", err)
+		return 0
+	}
+
+	o.ExId = uint64(idInt)
+	return o.ExId
+}
+
 // parseTitle - находит заголовок
 func (o *Offer) parseTitle() string {
-	o.Title = o.doc.Find(".ipsType_pagetitle").Text()
-	return o.Title
+	o.Topic = o.doc.Find(".ipsType_pagetitle").Text()
+	return o.Topic
 }
 
 // parsePrice - находит цену их баджика
@@ -62,7 +94,7 @@ func (o *Offer) parseRoomNumber() string {
 
 // parseBody - находит тело объявления
 func (o *Offer) parseBody() string {
-	// todo: нужно почистить от картинок и html тегов
+	// todo: нужно почистить от html тегов
 	o.Body = o.doc.Find(".post.entry-content").Text()
 	return o.Body
 }
