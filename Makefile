@@ -5,13 +5,13 @@ mod:
 	GO111MODULE=on go mod vendor
 
 run:
-	go run main.go
+	go run *.go
 
 dockerbuild:
-	docker build -t realtor_bot .
+	docker build -t house_search_assistant .
 
 dockertest:
 	docker build -f DockerfileTest .
 
 dockerrun: dockerbuild
-	docker run -d realtor_bot
+	docker run -d house_search_assistant
