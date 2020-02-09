@@ -1,8 +1,9 @@
 -- +goose Up
 -- +goose StatementBegin
-create table user_to_offer
+create table answer
 (
-    user_id  integer not null,
+    created  integer not null,
+    chat     integer not null,
     offer_id integer not null,
     -- sqlite не поддерживает boolean тип, по этому спользуется integer 1/0
     -- в других бд, boolean выглядит как tinyint, то есть 1/0, так что это норм
@@ -11,15 +12,15 @@ create table user_to_offer
     skip     integer
 );
 
-create index user_to_offer_offer_id_index
-    on user_to_offer (offer_id);
+create index answer_offer_id_index
+    on answer (offer_id);
 
-create index user_to_offer_user_id_index
-    on user_to_offer (user_id);
+create index answer_chat_index
+    on answer (chat);
 
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-drop table if exists user_to_offer;
+drop table if exists answer;
 -- +goose StatementEnd

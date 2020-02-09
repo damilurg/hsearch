@@ -15,22 +15,14 @@ import (
 )
 
 const (
-	BaseURL      = "http://diesel.elcat.kg/index.php?showforum=305?page=%d"
-	helpCommands = "[migrate|bgm]"
+	BaseURL      = "http://diesel.elcat.kg/index.php?showforum=305&page=%d"
+	helpCommands = "house_search_assistant: '%s' is not a command.\n" +
+		"usage: go run main.go [migrate]\n\n" +
+		"By default house_search_assistant run offer manager and telegram" +
+		" bot.\nFor example: go run main.go\n\n" +
+		"Commands:\n" +
+		"\tmigrate - the command for run migration and create DB if not exist\n"
 )
-
-/* TODO: проблемы
-    1. протестировать ReadUsersForOrder
-    2. бот не понимает какие квартиры отправлял, а какие нет
-    3. менеджер так же спамит все
-    4. не реализовано skip
-    5. не реализовано images
-    6. не реализовано description
-    7. не реализовано like
-    8. не реализовано skip
-    9. описать helpCommands
-    10. пройтись по всем туду
-*/
 
 func main() {
 	cnf, err := configs.GetConf()
@@ -38,7 +30,7 @@ func main() {
 		log.Fatalln("[main.GetConf] error: ", err)
 	}
 
-	db, err := storage.New()
+	db, err := storage.New(cnf)
 	if err != nil {
 		log.Fatalln("[main.storage.New] error: ", err)
 	}
@@ -52,13 +44,18 @@ func main() {
 				log.Fatalln("[main.storage.Migrate] error: ", err)
 			}
 		default:
-			fmt.Println("Я тебя не понимаю. Вот что могу\n", helpCommands)
+			fmt.Printf(helpCommands, os.Args[1])
 		}
 		return
 	}
 
+	// Telegram bot и Offer manager в дальнейшем нужно запускать как отдельные
+	// сервисы, а главный поток оставить следить за ними. Таким образом можно
+	// сделать graceful shutdown, reload config да и просто по приколу
+
 	telegramBot := bots.NewTelegramBot(cnf, db)
 	go telegramBot.Start()
 
-	background.StartOfferManager(BaseURL, cnf, db, telegramBot)
+	omr := background.StartOfferManager(BaseURL, cnf, db, telegramBot)
+	omr.Start()
 }
