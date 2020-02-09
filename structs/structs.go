@@ -1,37 +1,64 @@
 package structs
 
 import (
-	"log"
-	"net/url"
-	"strconv"
+	"regexp"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
 type (
-	// Offer - хранит все объявления c diesel
+	// User - telegram аккаунт пользователя
+	User struct {
+		Username string
+		Chat     int64
+		Enable   bool
+	}
+
+	// Offer - хранит все предложения о квартирах
 	Offer struct {
 		Id         uint64
-		ExId       uint64
+		Created    int64
 		Url        string
 		Topic      string
 		Price      string
 		Phone      string
-		RoomNumber string
+		Rooms      string
 		Body       string
-		Images     []string
+		Images     int
+		ImagesList []string
 		doc        *goquery.Document
+	}
+
+	// Answer - это ManyToMany для хранения реакции пользователя на
+	// объявдение
+	Answer struct {
+		Created int64
+		Chat    uint64
+		Offer   uint64
+		Like    bool
+		Dislike bool
+		Skip    uint64
+	}
+
+	// Feedback - структура для обратной связи в надежде получать баг репорты
+	// а не угрозы что я бизнес чей-то сломал
+	Feedback struct {
+		Username string
+		Chat     int64
+		Body     string
 	}
 )
 
+// TODO: это должно быть в парсере 🤦‍
 // ParseNewOffer - заполняет структуру объявления
-func ParseNewOffer(href string, doc *goquery.Document) *Offer {
+func ParseNewOffer(href string, exId uint64, doc *goquery.Document) *Offer {
 	offer := &Offer{
 		Url: href,
+		Id:  exId,
 		doc: doc,
 	}
 
-	offer.parseId(href)
 	offer.parseTitle()
 	offer.parsePrice()
 	offer.parsePhone()
@@ -39,30 +66,6 @@ func ParseNewOffer(href string, doc *goquery.Document) *Offer {
 	offer.parseBody()
 	offer.parseImages()
 	return offer
-}
-
-// parseId - достает Id из URL
-func (o *Offer) parseId(href string) uint64 {
-	urlPath, err := url.Parse(href)
-	if err != nil {
-		log.Println("[parseId.Parse] error:", err)
-		return 0
-	}
-
-	id := urlPath.Query().Get("showtopic")
-	if id == "" {
-		log.Println("[parseId.Get] id is empty")
-		return 0
-	}
-
-	idInt, err := strconv.Atoi(id)
-	if err != nil {
-		log.Println("[parseId.Atoi] error:", err)
-		return 0
-	}
-
-	o.ExId = uint64(idInt)
-	return o.ExId
 }
 
 // parseTitle - находит заголовок
@@ -87,15 +90,23 @@ func (o *Offer) parsePhone() string {
 func (o *Offer) parseRoomNumber() string {
 	roomNumberNodes := o.doc.Find("span:contains('Количество комнат')").Parent().Children().Nodes
 	if len(roomNumberNodes) > 1 {
-		o.RoomNumber = goquery.NewDocumentFromNode(roomNumberNodes[1]).Text()
+		o.Rooms = goquery.NewDocumentFromNode(roomNumberNodes[1]).Text()
 	}
-	return o.RoomNumber
+	return o.Rooms
 }
 
 // parseBody - находит тело объявления
 func (o *Offer) parseBody() string {
-	// todo: нужно почистить от html тегов
-	o.Body = o.doc.Find(".post.entry-content").Text()
+	messages := o.doc.Find(".post.entry-content").Nodes
+	if len(messages) != 0 {
+		body := goquery.NewDocumentFromNode(messages[0]).Text()
+		reg := regexp.MustCompile(`Сообщение отредактировал.*`)
+		body = reg.ReplaceAllString(body, "${1}")
+		body = strings.Replace(body, "Прикрепленные изображения", "", 1)
+		body = strings.Replace(body, "  ", "", 1)
+		body = strings.TrimSpace(body)
+		o.Body = body
+	}
 	return o.Body
 }
 
@@ -104,8 +115,9 @@ func (o *Offer) parseImages() []string {
 	o.doc.Find(".attach").Each(func(i int, s *goquery.Selection) {
 		href, ok := s.Attr("src")
 		if ok {
-			o.Images = append(o.Images, href)
+			o.ImagesList = append(o.ImagesList, href)
+			o.Images += 1
 		}
 	})
-	return o.Images
+	return o.ImagesList
 }

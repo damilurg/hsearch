@@ -2,19 +2,12 @@
 -- +goose StatementBegin
 create table user
 (
-    id       integer not null
-        constraint user_pk
-            primary key autoincrement,
-    username varchar(100),
-    chat     integer,
-    enable   integer default 0
+    username varchar(100) default '',
+    chat     integer      not null,
+    enable   integer      default 0
 );
 
-
-create unique index user_id_uindex
-    on user (id);
-
-create index user_chat_index
+create unique index user_chat_index
     on user (chat);
 
 create unique index user_name_uindex

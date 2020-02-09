@@ -2,20 +2,16 @@
 -- +goose StatementBegin
 create table offer
 (
-    id           integer not null
-                     constraint offer_pk
-                         primary key autoincrement,
-    ex_id        integer      not null,
+    id           integer      not null,
+    created      integer      not null,
     url          varchar(255) default '',
     topic        varchar(255) default '',
     price        real,
     phone        varchar(255) default '',
     room_numbers varchar(255) default '',
-    body         text         default ''
+    body         text         default '',
+    images       integer      not null
 );
-
-create unique index offer_ex_id_uindex
-    on offer (ex_id);
 
 create unique index offer_id_uindex
     on offer (id);

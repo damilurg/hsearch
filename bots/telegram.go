@@ -13,9 +13,14 @@ type (
 	Storage interface {
 		StartSearch(chat int64, username string) error
 		StopSearch(username string) error
-		Bookmarks(username string) ([]*structs.Offer, int64, error)
-		SaveMessage(msgId int, offerId uint64, chat int64) error
 		Dislike(msgId int, user *structs.User) error
+		Skip(msgId int, user *structs.User) error
+		Bookmarks(username string) ([]*structs.Offer, int64, error)
+		Feedback(chat int64, username, body string) error
+
+		SaveMessage(msgId int, offerId uint64, chat int64) error
+		ReadOfferDescription(msgId int, user *structs.User) (string, error)
+		ReadOfferImages(msgId int, user *structs.User) ([]string, error)
 		ReadNextOffer(user *structs.User) (*structs.Offer, error)
 	}
 
@@ -55,7 +60,7 @@ func (b *Bot) Start() {
 		return
 	}
 
-	log.Println("Start listen Telegram chanel")
+	log.Println("[bot] Start listen Telegram chanel")
 	for update := range updates {
 		if update.CallbackQuery != nil {
 			b.answers[update.CallbackQuery.Data](update.CallbackQuery)
@@ -65,16 +70,14 @@ func (b *Bot) Start() {
 			msg := "Нет среди доступных команд :("
 			if update.Message.IsCommand() {
 				switch update.Message.Command() {
-				case "start":
+				case "start", "help":
 					msg = b.start(update.Message)
-				case "help":
-					msg = b.help(update.Message)
 				case "stop":
 					msg = b.stop(update.Message)
 				case "search":
 					msg = b.search(update.Message)
-				case "bookmarks":
-					msg = b.bookmarks(update.Message)
+				case "feedback":
+					msg = b.feedback(update.Message)
 				}
 			}
 
@@ -100,16 +103,27 @@ func (b *Bot) SendOffer(offer *structs.Offer, user *structs.User, query *tgbotap
 		}
 	}
 
-	message := tgbotapi.NewMessage(user.Chat, DefaultMessage(offer))
-	message.ReplyMarkup = defaultKeyboard
+	message := tgbotapi.NewMessage(user.Chat, noOffers)
+	if offer != nil {
+		message = tgbotapi.NewMessage(user.Chat, DefaultMessage(offer))
+		message.DisableWebPagePreview = true
+		message.ReplyMarkup = getKeyboard(offer)
+	}
 
 	send, err := b.bot.Send(message)
 	if err != nil {
 		return err
 	}
 
+	if offer == nil {
+		return nil
+	}
+
 	err = b.st.SaveMessage(send.MessageID, offer.Id, user.Chat)
 	if err != nil {
+		// Если и произошла ошибка, то пользователь уже получил сообщение в
+		// телеграм. Мы просто оповещаем разработчика через лог и говорим, что
+		// отправка сообщения была успешно
 		log.Println("[SendOffer.SaveMessage] error:", err)
 	}
 

@@ -4,21 +4,26 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
+	"strconv"
 
 	"github.com/aastashov/house_search_assistant/structs"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
-// Parse - получает страницу по URL, перебирает объявления и возвращает
+// [NOT]: Тема-негативка. Только факты. Арендаторам и Арендодателям внимание!
+const negativeTheme = 2477961
+
+// LoadNewOffers - получает страницу по URL, перебирает объявления и возвращает
 // список объявдений
-func Parse(url string) ([]*structs.Offer, error) {
+func LoadNewOffers(url string) (map[uint64]string, error) {
 	doc, err := GetDocumentByUrl(url)
 	if err != nil {
 		return nil, err
 	}
 
-	var offers []*structs.Offer
+	offers := make(map[uint64]string)
 
 	// находим все топики на странице и проходися по ним, заполняя список
 	// найденых объявлений
@@ -30,18 +35,32 @@ func Parse(url string) ([]*structs.Offer, error) {
 			return
 		}
 
-		// на основной странице почти нет никакой информации, по этому идем на
-		// страницу и вытаскиваем больше информации об объявлении
-		doc, err := GetDocumentByUrl(href)
+		offerId, err := idFromHref(href)
 		if err != nil {
-			log.Println("[Parse.GetDocumentByUrl] error:", err)
+			log.Println("Can't get Id from href with an error", err)
 			return
 		}
 
-		offers = append(offers, structs.ParseNewOffer(href, doc))
+		offers[offerId] = href
 	})
 
+	delete(offers, negativeTheme)
 	return offers, nil
+}
+
+// LoadOffersDetail - выгружает и парсит offers по href
+func LoadOffersDetail(offersList map[uint64]string) []*structs.Offer {
+	// TODO: это нужно сделать в горутинах
+	offers := make([]*structs.Offer, 0)
+	for id, href := range offersList {
+		doc, err := GetDocumentByUrl(href)
+		if err != nil {
+			log.Printf("Can't load offer %s with an error %s\f", href, err)
+			continue
+		}
+		offers = append(offers, structs.ParseNewOffer(href, id, doc))
+	}
+	return offers
 }
 
 // GetDocumentByUrl - получает страницу по http, читает и возвращет объект
@@ -65,4 +84,24 @@ func GetDocumentByUrl(url string) (*goquery.Document, error) {
 	}
 
 	return goquery.NewDocumentFromReader(res.Body)
+}
+
+// idFromHref - получение Id с URL предложения
+func idFromHref(href string) (uint64, error) {
+	urlPath, err := url.Parse(href)
+	if err != nil {
+		return 0, err
+	}
+
+	id := urlPath.Query().Get("showtopic")
+	if id == "" {
+		return 0, fmt.Errorf("id not contain in href")
+	}
+
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		return 0, err
+	}
+
+	return uint64(idInt), nil
 }
