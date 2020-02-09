@@ -4,6 +4,9 @@ mod:
 	GO111MODULE=on go mod tidy
 	GO111MODULE=on go mod vendor
 
+migrate:
+	go run *.go migrate
+
 run:
 	go run *.go
 
