@@ -1,6 +1,6 @@
 FROM golang:1.13.1-alpine3.10 AS builder
 
-RUN apk --no-cache add git gcc
+RUN apk --no-cache add git gcc g++
 COPY . /srv
 
 RUN set -x \
