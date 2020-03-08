@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/aastashov/house_search_assistant/configs"
-	"github.com/aastashov/house_search_assistant/structs"
+	"github.com/comov/gilles_search_kg/configs"
+	"github.com/comov/gilles_search_kg/structs"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pressly/goose"
@@ -29,7 +29,7 @@ var regexContain = regexp.MustCompile(`UNIQUE constraint failed*`)
 // New - возвращает коннектор для подключения к базе данных. Код не должен знать
 // какая бд или какой драйвер используется для работы с базой.
 func New(cnf *configs.Config) (*Connector, error) {
-	db, err := sql.Open("sqlite3", "house_search_assistant.db?cache=shared")
+	db, err := sql.Open("sqlite3", "gilles_search_kg.db?cache=shared")
 	if err != nil {
 		return nil, err
 	}

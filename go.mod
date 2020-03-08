@@ -1,4 +1,4 @@
-module github.com/aastashov/house_search_assistant
+module github.com/comov/gilles_search_kg
 
 go 1.13
 

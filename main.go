@@ -6,19 +6,19 @@ import (
 	"os"
 	"path"
 
-	"github.com/aastashov/house_search_assistant/background"
-	"github.com/aastashov/house_search_assistant/bots"
-	"github.com/aastashov/house_search_assistant/configs"
-	"github.com/aastashov/house_search_assistant/storage"
+	"github.com/comov/gilles_search_kg/background"
+	"github.com/comov/gilles_search_kg/bots"
+	"github.com/comov/gilles_search_kg/configs"
+	"github.com/comov/gilles_search_kg/storage"
 
 	_ "github.com/joho/godotenv/autoload"
 )
 
 const (
 	BaseURL      = "http://diesel.elcat.kg/index.php?showforum=305&page=%d"
-	helpCommands = "house_search_assistant: '%s' is not a command.\n" +
+	helpCommands = "gilles_search_kg: '%s' is not a command.\n" +
 		"usage: go run main.go [migrate]\n\n" +
-		"By default house_search_assistant run offer manager and telegram" +
+		"By default gilles_search_kg run offer manager and telegram" +
 		" bot.\nFor example: go run main.go\n\n" +
 		"Commands:\n" +
 		"\tmigrate - the command for run migration and create DB if not exist\n"

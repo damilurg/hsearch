@@ -4,14 +4,14 @@ COPY . /srv
 
 RUN set -x \
     && cd /srv \
-    && go build -mod vendor -o house_search_assistant .
+    && go build -mod vendor -o gilles_search_kg .
 
 
 FROM alpine:3.10.2
 
 RUN apk add --no-cache ca-certificates
 
-COPY --from=builder /srv/house_search_assistant /srv/house_search_assistant
+COPY --from=builder /srv/gilles_search_kg /srv/gilles_search_kg
 COPY --from=builder /srv/migrations /srv/migrations
 
-CMD ["/srv/house_search_assistant"]
+CMD ["/srv/gilles_search_kg"]

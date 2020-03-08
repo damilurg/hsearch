@@ -3,8 +3,8 @@ package bots
 import (
 	"log"
 
-	"github.com/aastashov/house_search_assistant/configs"
-	"github.com/aastashov/house_search_assistant/structs"
+	"github.com/comov/gilles_search_kg/configs"
+	"github.com/comov/gilles_search_kg/structs"
 
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 )

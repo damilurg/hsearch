@@ -3,7 +3,7 @@ package bots
 import (
 	"log"
 
-	"github.com/aastashov/house_search_assistant/structs"
+	"github.com/comov/gilles_search_kg/structs"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
