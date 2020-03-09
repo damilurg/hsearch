@@ -11,10 +11,10 @@ run:
 	go run *.go
 
 dockerbuild:
-	docker build -t gilles_search_kg .
+	docker build -t hsearch .
 
 dockertest:
 	docker build -f DockerfileTest .
 
 dockerrun: dockerbuild
-	docker run -d gilles_search_kg
+	docker run -d hsearch

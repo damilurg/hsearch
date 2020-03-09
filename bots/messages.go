@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/comov/gilles_search_kg/structs"
+	"github.com/comov/hsearch/structs"
 )
 
 const startMessage = `

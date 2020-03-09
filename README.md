@@ -1,4 +1,4 @@
-# gilles_search_kg
+# hsearch
 Парсер на GoLang форума diesel.elcat.kg для поиска нужной мне квартиры. Пишется
  одним разработчиком и код пока не готов к опенсоурс. Но если хочется боли, без
  документации и тестов (они будут), то го.
@@ -23,8 +23,8 @@ diesel не предоставляет инструментов для отсе�
 ## Developer documentation
 The project supports go modules
 ```shell script
-git clone https://github.com/comov/gilles_search_kg.git
-cd gilles_search_kg
+git clone https://github.com/comov/hsearch.git
+cd hsearch
 make mod
 make migrate
 make run

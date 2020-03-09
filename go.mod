@@ -1,4 +1,4 @@
-module github.com/comov/gilles_search_kg
+module github.com/comov/hsearch
 
 go 1.13
 

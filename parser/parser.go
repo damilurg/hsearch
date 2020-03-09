@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/comov/gilles_search_kg/structs"
+	"github.com/comov/hsearch/structs"
 
 	"github.com/PuerkitoBio/goquery"
 )

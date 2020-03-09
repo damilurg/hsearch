@@ -20,9 +20,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/comov/gilles_search_kg/configs"
-	"github.com/comov/gilles_search_kg/parser"
-	"github.com/comov/gilles_search_kg/structs"
+	"github.com/comov/hsearch/configs"
+	"github.com/comov/hsearch/parser"
+	"github.com/comov/hsearch/structs"
 )
 
 type (

@@ -6,19 +6,19 @@ import (
 	"os"
 	"path"
 
-	"github.com/comov/gilles_search_kg/background"
-	"github.com/comov/gilles_search_kg/bots"
-	"github.com/comov/gilles_search_kg/configs"
-	"github.com/comov/gilles_search_kg/storage"
+	"github.com/comov/hsearch/background"
+	"github.com/comov/hsearch/bots"
+	"github.com/comov/hsearch/configs"
+	"github.com/comov/hsearch/storage"
 
 	_ "github.com/joho/godotenv/autoload"
 )
 
 const (
 	BaseURL      = "http://diesel.elcat.kg/index.php?showforum=305&page=%d"
-	helpCommands = "gilles_search_kg: '%s' is not a command.\n" +
+	helpCommands = "hsearch: '%s' is not a command.\n" +
 		"usage: go run main.go [migrate]\n\n" +
-		"By default gilles_search_kg run offer manager and telegram" +
+		"By default hsearch run offer manager and telegram" +
 		" bot.\nFor example: go run main.go\n\n" +
 		"Commands:\n" +
 		"\tmigrate - the command for run migration and create DB if not exist\n"
