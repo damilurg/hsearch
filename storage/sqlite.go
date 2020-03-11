@@ -318,22 +318,21 @@ func (c *Connector) Bookmarks(username string) ([]*structs.Offer, int64, error) 
 	return offers, user.Chat, nil
 }
 
-func (c *Connector) SaveMessage(msgId int, offerId uint64, chat int64) error {
-	_, err := c.DB.Exec("INSERT INTO tg_messages (message_id, offer_id, chat, created) VALUES (?, ?, ?, ?);",
+func (c *Connector) SaveMessage(msgId int, offerId uint64, chat int64, kind string) error {
+	_, err := c.DB.Exec("INSERT INTO tg_messages (message_id, offer_id, kind, chat, created) VALUES (?, ?, ?, ?, ?);",
 		msgId,
 		offerId,
+		kind,
 		chat,
 		time.Now().Unix(),
 	)
 
-	if err != nil && !regexContain.MatchString(err.Error()) {
-		return nil
-	}
 	return err
 }
 
-func (c *Connector) Dislike(msgId int, user *structs.User) error {
+func (c *Connector) Dislike(msgId int, user *structs.User) ([]int, error) {
 	offerId := uint64(0)
+	msgIds := make([]int, 0)
 	err := c.DB.QueryRow(
 		"SELECT offer_id FROM tg_messages WHERE message_id = ? AND chat = ?;",
 		msgId,
@@ -342,12 +341,12 @@ func (c *Connector) Dislike(msgId int, user *structs.User) error {
 		&offerId,
 	)
 	if err != nil {
-		return err
+		return msgIds, err
 	}
 
 	err = c.ReadUser(user)
 	if err != nil {
-		return err
+		return msgIds, err
 	}
 
 	_, err = c.DB.Exec(
@@ -357,7 +356,38 @@ func (c *Connector) Dislike(msgId int, user *structs.User) error {
 		1,
 		time.Now().Unix(),
 	)
-	return err
+
+	rows, err := c.DB.Query(
+		`SELECT message_id FROM tg_messages WHERE offer_id = ? AND chat = ?;`,
+		offerId,
+		user.Chat,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return msgIds, nil
+		}
+		return msgIds, err
+	}
+
+	defer func() {
+		err := rows.Close()
+		if err != nil {
+			log.Println("[Dislike] error:", err)
+		}
+	}()
+
+	for rows.Next() {
+		var mId int
+		err := rows.Scan(&mId)
+		if err != nil {
+			log.Println("[Dislike.Scan] error:", err)
+			continue
+		}
+		msgIds = append(msgIds, mId)
+	}
+
+	return msgIds, err
 }
 
 func (c *Connector) Skip(msgId int, user *structs.User) error {
@@ -440,7 +470,7 @@ func (c *Connector) ReadNextOffer(user *structs.User) (*structs.Offer, error) {
 	return offer, nil
 }
 
-func (c *Connector) ReadOfferDescription(msgId int, user *structs.User) (string, error) {
+func (c *Connector) ReadOfferDescription(msgId int, user *structs.User) (uint64, string, error) {
 	offerId := uint64(0)
 	err := c.DB.QueryRow(
 		"SELECT offer_id FROM tg_messages WHERE message_id = ? AND chat = ?;",
@@ -450,7 +480,7 @@ func (c *Connector) ReadOfferDescription(msgId int, user *structs.User) (string,
 		&offerId,
 	)
 	if err != nil {
-		return "", err
+		return offerId, "", err
 	}
 
 	description := ""
@@ -462,15 +492,15 @@ func (c *Connector) ReadOfferDescription(msgId int, user *structs.User) (string,
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return "Предложение не найдено, возможно было удалено", nil
+			return offerId, "Предложение не найдено, возможно было удалено", nil
 		}
-		return "", err
+		return offerId, "", err
 	}
 
-	return description, nil
+	return offerId, description, nil
 }
 
-func (c *Connector) ReadOfferImages(msgId int, user *structs.User) ([]string, error) {
+func (c *Connector) ReadOfferImages(msgId int, user *structs.User) (uint64, []string, error) {
 	offerId := uint64(0)
 	images := make([]string, 0)
 
@@ -482,15 +512,15 @@ func (c *Connector) ReadOfferImages(msgId int, user *structs.User) ([]string, er
 		&offerId,
 	)
 	if err != nil {
-		return images, err
+		return offerId, images, err
 	}
 
 	rows, err := c.DB.Query(`SELECT path FROM image im WHERE im.offer_id = ?;`, offerId)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return images, nil
+			return offerId, images, nil
 		}
-		return images, err
+		return offerId, images, err
 	}
 
 	defer func() {
@@ -512,7 +542,7 @@ func (c *Connector) ReadOfferImages(msgId int, user *structs.User) ([]string, er
 		images = append(images, image)
 	}
 
-	return images, nil
+	return offerId, images, nil
 }
 
 func (c *Connector) Feedback(chat int64, username, body string) error {
