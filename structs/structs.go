@@ -7,6 +7,12 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+const (
+	KindOffer       = "offer"
+	KindPhoto       = "photo"
+	KindDescription = "description"
+)
+
 type (
 	// User - telegram аккаунт пользователя
 	User struct {

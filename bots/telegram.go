@@ -13,14 +13,14 @@ type (
 	Storage interface {
 		StartSearch(chat int64, username string) error
 		StopSearch(username string) error
-		Dislike(msgId int, user *structs.User) error
+		Dislike(msgId int, user *structs.User) ([]int, error)
 		Skip(msgId int, user *structs.User) error
 		Bookmarks(username string) ([]*structs.Offer, int64, error)
 		Feedback(chat int64, username, body string) error
 
-		SaveMessage(msgId int, offerId uint64, chat int64) error
-		ReadOfferDescription(msgId int, user *structs.User) (string, error)
-		ReadOfferImages(msgId int, user *structs.User) ([]string, error)
+		SaveMessage(msgId int, offerId uint64, chat int64, kind string) error
+		ReadOfferDescription(msgId int, user *structs.User) (uint64, string, error)
+		ReadOfferImages(msgId int, user *structs.User) (uint64, []string, error)
 		ReadNextOffer(user *structs.User) (*structs.Offer, error)
 	}
 
@@ -90,6 +90,7 @@ func (b *Bot) Start() {
 	}
 }
 
+// TODO: It looks like shit. Please, rewrite this code :cry:
 // SendOffer - отправляет offer пользователю, так же региструрует в бд под
 // какие номером сообщения было отправленно сообщение и меняет клавиатуру в
 // зависимости от offer
@@ -103,23 +104,20 @@ func (b *Bot) SendOffer(offer *structs.Offer, user *structs.User, query *tgbotap
 		}
 	}
 
-	message := tgbotapi.NewMessage(user.Chat, noOffers)
-	if offer != nil {
-		message = tgbotapi.NewMessage(user.Chat, DefaultMessage(offer))
-		message.DisableWebPagePreview = true
-		message.ReplyMarkup = getKeyboard(offer)
+	if offer == nil {
+		return nil
 	}
+
+	message := tgbotapi.NewMessage(user.Chat, DefaultMessage(offer))
+	message.DisableWebPagePreview = true
+	message.ReplyMarkup = getKeyboard(offer)
 
 	send, err := b.bot.Send(message)
 	if err != nil {
 		return err
 	}
 
-	if offer == nil {
-		return nil
-	}
-
-	err = b.st.SaveMessage(send.MessageID, offer.Id, user.Chat)
+	err = b.st.SaveMessage(send.MessageID, offer.Id, user.Chat, structs.KindOffer)
 	if err != nil {
 		// Если и произошла ошибка, то пользователь уже получил сообщение в
 		// телеграм. Мы просто оповещаем разработчика через лог и говорим, что
