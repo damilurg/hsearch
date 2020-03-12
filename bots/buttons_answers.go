@@ -46,9 +46,12 @@ func (b *Bot) dislike(user *structs.User, query *tgbotapi.CallbackQuery) {
 	}
 
 	for _, id := range messagesIds {
-		_, _ = b.bot.DeleteMessage(
+		_, err := b.bot.DeleteMessage(
 			tgbotapi.NewDeleteMessage(query.Message.Chat.ID, id),
 		)
+		if err != nil {
+			log.Println("[dislike.DeleteMessage] error:", err)
+		}
 	}
 
 	err = b.SendOffer(nil, user, query, "Больше никогда не покажу")
@@ -132,10 +135,14 @@ func (b *Bot) photo(user *structs.User, query *tgbotapi.CallbackQuery) {
 	}
 
 	if len(images) != 0 {
-		_, _ = b.bot.DeleteMessage(tgbotapi.NewDeleteMessage(
+		_, err := b.bot.DeleteMessage(tgbotapi.NewDeleteMessage(
 			query.Message.Chat.ID,
 			waitMessage.MessageID,
 		))
+
+		if err != nil {
+			log.Println("[photo.DeleteMessage] error:", err)
+		}
 	}
 }
 
