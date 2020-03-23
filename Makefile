@@ -5,13 +5,13 @@ mod:
 	GO111MODULE=on go mod vendor
 
 migrate:
-	go run *.go migrate
+	go run cmd/hsearch/*.go migrate
 
 run:
 	go run *.go
 
 dockerbuild:
-	docker build -t hsearch .
+	docker build -t comov/hsearch:latest .
 
 dockertest:
 	docker build -f DockerfileTest .
