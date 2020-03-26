@@ -1,9 +1,11 @@
-FROM golang:1.14.1-alpine3.11 AS builder
+FROM golang:1.13.1-alpine3.10 AS builder
 
 RUN apk --no-cache add git gcc g++
 COPY . /srv
 
-RUN cd /srv/ && go build -o /go/bin/hsearch cmd/hsearch/*.go
+RUN set -x \
+    && cd /srv/ \
+    && go build -mod vendor -o /go/bin/hsearch cmd/hsearch/*.go
 
 
 FROM alpine:3.11.5
