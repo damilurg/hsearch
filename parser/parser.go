@@ -58,7 +58,7 @@ func LoadOffersDetail(offersList map[uint64]string) []*structs.Offer {
 			log.Printf("Can't load offer %s with an error %s\f", href, err)
 			continue
 		}
-		offers = append(offers, structs.ParseNewOffer(href, id, doc))
+		offers = append(offers, ParseNewOffer(href, id, doc))
 	}
 	return offers
 }

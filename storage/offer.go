@@ -4,60 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"regexp"
 	"strconv"
 	"time"
 
-	"github.com/comov/hsearch/configs"
 	"github.com/comov/hsearch/structs"
-
-	_ "github.com/mattn/go-sqlite3"
-	"github.com/pressly/goose"
 )
-
-type (
-	// Connector - структура для храниения и управления подключением к бд
-	Connector struct {
-		DB              *sql.DB
-		skipTime        time.Duration
-		freshOffersTime time.Duration
-	}
-)
-
-var regexContain = regexp.MustCompile(`UNIQUE constraint failed*`)
-
-// New - возвращает коннектор для подключения к базе данных. Код не должен знать
-// какая бд или какой драйвер используется для работы с базой.
-func New(cnf *configs.Config) (*Connector, error) {
-	db, err := sql.Open("sqlite3", "hsearch.db?cache=shared")
-	if err != nil {
-		return nil, err
-	}
-
-	// Для БД sqlite максимальное кол-во соединений желательно иметь 1, так как
-	// если писать в бд будут 2 потока, то файл может быть покрашен, что несет
-	// потерб данных. Это не production проет, по этому нет смысла в PG ил MySql
-	db.SetMaxOpenConns(1)
-
-	return &Connector{
-		DB:              db,
-		skipTime:        cnf.SkipTime,
-		freshOffersTime: cnf.FreshOffers,
-	}, nil
-}
-
-func (c *Connector) Migrate(path string) error {
-	err := goose.SetDialect("sqlite3")
-	if err != nil {
-		return err
-	}
-	err = goose.Run("up", c.DB, path)
-	if err == goose.ErrNoNextVersion {
-		return nil
-	}
-
-	return err
-}
 
 // WriteOffer - записывает Offer в базу вместе с картинками и вазвращает Id в
 // структуру
@@ -175,126 +126,8 @@ func (c *Connector) CleanFromExistOrders(offers map[uint64]string) error {
 	return nil
 }
 
-// ReadChatsForMatching - read all the chats for which the mailing list has
-// to be done
-func (c *Connector) ReadChatsForMatching() ([]*structs.Chat, error) {
-	rows, err := c.DB.Query(`
-	SELECT DISTINCT
-		c.id,
-		c.username,
-		c.title
-	FROM chat c
-	LEFT JOIN answer uto on (c.id = uto.chat and uto.dislike = 0)
-	WHERE c.enable = 1;`)
-	if err != nil {
-		return nil, err
-	}
-
-	defer func() {
-		err := rows.Close()
-		if err != nil {
-			log.Println("[ReadChatsForMatching.Close] error:", err)
-		}
-	}()
-
-	chats := make([]*structs.Chat, 0)
-	for rows.Next() {
-		chat := new(structs.Chat)
-		err := rows.Scan(
-			&chat.Id,
-			&chat.Username,
-			&chat.Title,
-		)
-		if err != nil {
-			log.Println("[ReadChatsForMatching.Scan] error:", err)
-			continue
-		}
-
-		chats = append(chats, chat)
-	}
-
-	return chats, nil
-}
-
-// StartSearch - register new user or group if not exist or enable receive new
-// offers.
-func (c *Connector) StartSearch(id int64, username, title, cType string) error {
-	chat, err := c.ReadChat(id)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			_, err := c.DB.Exec(
-				`INSERT INTO chat (id, username, title, enable, c_type)
-						VALUES (?, ?, ?, ?, ?);`,
-				id,
-				username,
-				title,
-				true,
-				cType,
-			)
-			return err
-		}
-		return err
-	}
-
-	_, err = c.DB.Exec("UPDATE chat SET enable = 1 WHERE id = ?;", chat.Id)
-	return err
-}
-
-// ReadChat - return chat with user or with group if exist or return error.
-func (c *Connector) ReadChat(id int64) (*structs.Chat, error) {
-	chat := &structs.Chat{}
-	err := c.DB.QueryRow(
-		`SELECT id, username, title, enable, c_type
-				FROM chat
-				WHERE id = ?;`,
-		id,
-	).Scan(
-		&chat.Id,
-		&chat.Username,
-		&chat.Title,
-		&chat.Enable,
-		&chat.Type,
-	)
-	return chat, err
-}
-
-// StopSearch - disable receive message about new offers.
-func (c *Connector) StopSearch(id int64) error {
-	resp, err := c.DB.Exec("UPDATE chat SET enable = 0 WHERE id = ?;", id)
-	if err != nil {
-		return err
-	}
-
-	affect, err := resp.RowsAffected()
-	if err != nil {
-		return err
-	}
-
-	if affect == 0 {
-		return sql.ErrNoRows
-	}
-
-	return nil
-}
-
-// SaveMessage - when we send user or group offer, description or photos, we
-// save this message for subsequent removal from chat, if need.
-func (c *Connector) SaveMessage(msgId int, offerId uint64, chat int64, kind string) error {
-	_, err := c.DB.Exec(
-		`INSERT INTO tg_messages (message_id, offer_id, kind, chat, created)
- 				VALUES (?, ?, ?, ?, ?);`,
-		msgId,
-		offerId,
-		kind,
-		chat,
-		time.Now().Unix(),
-	)
-
-	return err
-}
-
 // Dislike - mark offer as bad for user or group and return all message ids
-// (description and photos) for delete from chat.
+//  (description and photos) for delete from chat.
 func (c *Connector) Dislike(msgId int, chatId int64) ([]int, error) {
 	offerId := uint64(0)
 	msgIds := make([]int, 0)
@@ -501,15 +334,4 @@ func (c *Connector) ReadOfferImages(msgId int, chatId int64) (uint64, []string, 
 	}
 
 	return offerId, images, nil
-}
-
-func (c *Connector) Feedback(chat int64, username, body string) error {
-	_, err := c.DB.Exec(
-		"INSERT INTO feedback (created, chat, username, body) VALUES (?, ?, ?, ?);",
-		time.Now().Unix(),
-		chat,
-		username,
-		body,
-	)
-	return err
 }
