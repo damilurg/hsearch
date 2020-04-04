@@ -4,35 +4,36 @@ import (
 	"time"
 
 	"github.com/caarlos0/env/v6"
+	"github.com/getsentry/sentry-go"
 )
 
 var Release string
 
-// Config - структура содержащая все изменяемые конфигурации приложения
+// Config - the structure that contains all the customizable application
+//  configurations
 type Config struct {
-	Release string
+	Release         string
+	SentryDSN       string `env:"SENTRY_DSN"`
+	ParseMaxPage    int    `env:"PARSER_MAX_PAGE"`
+	ParserFrequency string `env:"PARSER_FREQUENCY"`
+	OrderSkipDelay  string `env:"ORDER_SKIP_DELAY"`
+	OrderRelevance  string `env:"ORDER_RELEVANCE"`
+	TelegramToken   string `env:"T_TOKEN"`
+	TelegramChatId  int64  `env:"T_CHAT_ID"`
 
-	// TODO: нейминг страдает
-	MaxPage           int    `env:"MAXPAGE"`
-	TelegramToken     string `env:"TOKEN"`
-	ParserSleepTime   string `env:"PARSER_SLEEP_TIME"`
-	SkipTimeString    string `env:"SKIP_TIME"`
-	FreshOffersString string `env:"FRESH_ORDER"`
-	AdminChatId       int64  `env:"ADMIN_CHAT_ID"`
-
-	ManagerDelay time.Duration
-	SkipTime     time.Duration
-	FreshOffers  time.Duration
+	FrequencyTime time.Duration
+	SkipDelayTime time.Duration
+	RelevanceTime time.Duration
 }
 
-// GetConf - возвращет конфигурацию приложения
+// GetConf - returns the application configuration
 func GetConf() (*Config, error) {
 	cfg := &Config{
-		Release:           Release,
-		MaxPage:           2,
-		ParserSleepTime:   "1m",
-		SkipTimeString:    "3m",
-		FreshOffersString: "2m",
+		Release:         Release,
+		ParseMaxPage:    2,
+		ParserFrequency: "1m",
+		OrderSkipDelay:  "3m",
+		OrderRelevance:  "2m",
 	}
 
 	err := env.Parse(cfg)
@@ -40,22 +41,32 @@ func GetConf() (*Config, error) {
 		return nil, err
 	}
 
-	// ManagerDelay
-	// Здесь немного не явный момент, в настройках мы задаем время задержки как
-	// строка 1m илил 12h, потом парсим в time.Duration
-	cfg.ManagerDelay, err = time.ParseDuration(cfg.ParserSleepTime)
+	err = sentry.Init(sentry.ClientOptions{
+		Dsn:        cfg.SentryDSN,
+		SampleRate: 0.5,
+	})
+
 	if err != nil {
 		return nil, err
 	}
 
-	// SkipTime
-	cfg.SkipTime, err = time.ParseDuration(cfg.SkipTimeString)
+	//// In the settings we set the delay time as line 1m or 12h, then parse
+	////  in time.
+
+	// RelevanceTime
+	cfg.FrequencyTime, err = time.ParseDuration(cfg.ParserFrequency)
 	if err != nil {
 		return nil, err
 	}
 
-	// FreshOffers
-	cfg.FreshOffers, err = time.ParseDuration(cfg.FreshOffersString)
+	// SkipDelayTime
+	cfg.SkipDelayTime, err = time.ParseDuration(cfg.OrderSkipDelay)
+	if err != nil {
+		return nil, err
+	}
+
+	// RelevanceTime
+	cfg.RelevanceTime, err = time.ParseDuration(cfg.OrderRelevance)
 	if err != nil {
 		return nil, err
 	}

@@ -50,7 +50,7 @@ func NewTelegramBot(cnf *configs.Config, st Storage) *Bot {
 	bb := &Bot{
 		bot:         bot,
 		storage:     st,
-		adminChatId: cnf.AdminChatId,
+		adminChatId: cnf.TelegramChatId,
 		release:     cnf.Release,
 		callbacks:   make(map[string]callback, 0),
 		waitAnswers: make(map[int64]answer),

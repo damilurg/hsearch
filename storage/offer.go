@@ -200,7 +200,7 @@ func (c *Connector) Skip(msgId int, chatId int64) error {
 		return err
 	}
 
-	skipTime := time.Now().Add(c.skipTime).Unix()
+	skipTime := time.Now().Add(c.skipDelayTime).Unix()
 	_, err = c.DB.Exec(
 		"INSERT INTO answer (chat, offer_id, skip, created) VALUES (?, ?, ?, ?);",
 		chatId,
@@ -237,7 +237,7 @@ func (c *Connector) ReadNextOffer(chatId int64) (*structs.Offer, error) {
 	`,
 		chatId,
 		chatId,
-		now.Add(-c.freshOffersTime).Unix(),
+		now.Add(-c.relevanceTime).Unix(),
 	).Scan(
 		&offer.Id,
 		&offer.Url,

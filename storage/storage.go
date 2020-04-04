@@ -14,9 +14,9 @@ import (
 type (
 	// Connector - the interface to the storage.
 	Connector struct {
-		DB              *sql.DB
-		skipTime        time.Duration
-		freshOffersTime time.Duration
+		DB            *sql.DB
+		skipDelayTime time.Duration
+		relevanceTime time.Duration
 	}
 )
 
@@ -37,9 +37,9 @@ func New(cnf *configs.Config) (*Connector, error) {
 	db.SetMaxOpenConns(1)
 
 	return &Connector{
-		DB:              db,
-		skipTime:        cnf.SkipTime,
-		freshOffersTime: cnf.FreshOffers,
+		DB:            db,
+		skipDelayTime: cnf.SkipDelayTime,
+		relevanceTime: cnf.RelevanceTime,
 	}, nil
 }
 

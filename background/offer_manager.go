@@ -69,9 +69,9 @@ func (m *OfferManager) parser() {
 	for {
 		select {
 		case <-time.After(sleep):
-			sleep = m.cnf.ManagerDelay
+			sleep = m.cnf.FrequencyTime
 
-			for i := 1; i <= m.cnf.MaxPage; i++ {
+			for i := 1; i <= m.cnf.ParseMaxPage; i++ {
 				target := fmt.Sprintf(m.url, i)
 				log.Printf("[offer_manager] start parse %s\n", target)
 				offersLinks, err := parser.LoadNewOffers(target)
@@ -101,7 +101,7 @@ func (m *OfferManager) parser() {
 				}
 
 				if newOffers < offersOnPage {
-					m.cnf.MaxPage = 1
+					m.cnf.ParseMaxPage = 1
 				}
 			}
 

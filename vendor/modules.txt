@@ -4,6 +4,8 @@ github.com/PuerkitoBio/goquery
 github.com/andybalholm/cascadia
 # github.com/caarlos0/env/v6 v6.1.0
 github.com/caarlos0/env/v6
+# github.com/getsentry/sentry-go v0.5.1
+github.com/getsentry/sentry-go
 # github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 github.com/go-telegram-bot-api/telegram-bot-api
 # github.com/joho/godotenv v1.3.0
@@ -17,6 +19,6 @@ github.com/pkg/errors
 github.com/pressly/goose
 # github.com/technoweenie/multipartstreamer v1.0.1
 github.com/technoweenie/multipartstreamer
-# golang.org/x/net v0.0.0-20190603091049-60506f45cf65
+# golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297
 golang.org/x/net/html
 golang.org/x/net/html/atom
