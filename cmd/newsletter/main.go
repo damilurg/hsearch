@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -10,8 +9,6 @@ import (
 	"github.com/comov/hsearch/bot"
 	"github.com/comov/hsearch/configs"
 	"github.com/comov/hsearch/storage"
-	"github.com/comov/hsearch/structs"
-
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
@@ -51,22 +48,9 @@ func main() {
 		message.ParseMode = tgbotapi.ModeMarkdown
 		msg, err := tBot.Send(message)
 		if err != nil {
-			log.Fatalln("[tBot.Send] error: ", err)
+			log.Printf("[tBot.Send] %d error: %s\n", chat.Id, err)
+			continue
 		}
-		updateChatsInfo(db, chat, msg)
-	}
-}
-
-// todo: remove after update chat info
-func updateChatsInfo(st *storage.Connector, chat *structs.Chat, m tgbotapi.Message) {
-	if chat.Type == "" {
-		title := m.Chat.Title
-		if m.Chat.IsPrivate() {
-			title = fmt.Sprintf("%s %s", m.Chat.FirstName, m.Chat.LastName)
-		}
-		err := st.UpdateChat(m.Chat.ID, title, m.Chat.Type)
-		if err != nil {
-			fmt.Printf("[UpdateChat] %s with an error: %s", m.Chat.UserName, err)
-		}
+		log.Printf("[tBot.Send] %s %s success\n", msg.Chat.FirstName, msg.Chat.LastName)
 	}
 }

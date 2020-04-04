@@ -47,7 +47,7 @@ func (b *Bot) feedback(message *tgbotapi.Message) string {
 }
 
 func (b *Bot) feedbackWaiterCallback(message *tgbotapi.Message, _ answer) {
-	msgText := "Понял, предам!"
+	msgText := "Понял, передам!"
 	err := b.storage.Feedback(message.Chat.ID, message.Chat.UserName, message.Text)
 	if err != nil {
 		log.Println("[feedbackWaiterCallback.Feedback] error:", err)

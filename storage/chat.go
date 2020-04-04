@@ -8,16 +8,6 @@ import (
 	"github.com/comov/hsearch/structs"
 )
 
-// todo: remove after update chat info
-func (c *Connector) UpdateChat(id int64, title, cType string) error {
-	_, err := c.DB.Exec("UPDATE chat SET title = ?, c_type = ? WHERE id = ?",
-		title,
-		cType,
-		id,
-	)
-	return err
-}
-
 // CreateChat - creates a chat room and sets the default settings.
 func (c *Connector) CreateChat(id int64, username, title, cType string) error {
 	_, err := c.DB.Exec(
