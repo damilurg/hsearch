@@ -3,11 +3,10 @@ FROM golang:1.13.1-alpine3.10 AS builder
 RUN apk --no-cache add git gcc g++
 COPY . /srv
 
-ARG RELEASE=""
-
 RUN set -x \
     && cd /srv/ \
-    && go build -mod vendor -i -ldflags "-X configs/configs.Release=$RELEASE" -o /go/bin/hsearch cmd/hsearch/*.go
+    && go build -mod vendor -o /go/bin/hsearch cmd/hsearch/*.go \
+    && go build -mod vendor -o /go/bin/newsletter cmd/newsletter/*.go
 
 
 FROM alpine:3.11.5
