@@ -32,6 +32,7 @@ type (
 		callbacks map[string]callback
 
 		adminChatId int64
+		release     string
 
 		// {time.Minutes * 3, b.callbackName(message *tgbotapi.Message)}
 		waitAnswers map[int64]answer
@@ -50,6 +51,7 @@ func NewTelegramBot(cnf *configs.Config, st Storage) *Bot {
 		bot:         bot,
 		storage:     st,
 		adminChatId: cnf.AdminChatId,
+		release:     cnf.Release,
 		callbacks:   make(map[string]callback, 0),
 		waitAnswers: make(map[int64]answer),
 	}
@@ -68,7 +70,7 @@ func (b *Bot) Start() {
 		return
 	}
 
-	log.Println("[bot] Start listen Telegram chanel")
+	log.Printf("[bot] Start listen Telegram chanel. Version %s\n", b.release)
 	for update := range updates {
 		if update.CallbackQuery != nil {
 			go b.callbackHandler(update)

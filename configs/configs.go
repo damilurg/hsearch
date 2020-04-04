@@ -6,8 +6,12 @@ import (
 	"github.com/caarlos0/env/v6"
 )
 
+var Release string
+
 // Config - структура содержащая все изменяемые конфигурации приложения
 type Config struct {
+	Release string
+
 	// TODO: нейминг страдает
 	MaxPage           int    `env:"MAXPAGE"`
 	TelegramToken     string `env:"TOKEN"`
@@ -24,7 +28,7 @@ type Config struct {
 // GetConf - возвращет конфигурацию приложения
 func GetConf() (*Config, error) {
 	cfg := &Config{
-		// здесь можно выставить параметры по умолчанию
+		Release:           Release,
 		MaxPage:           2,
 		ParserSleepTime:   "1m",
 		SkipTimeString:    "3m",
