@@ -91,11 +91,9 @@ func (s *Lalafo) ParseNewOffer(href string, exId uint64, doc *goquery.Document) 
 type JsonStruct struct {
 	Props struct {
 		InitialState struct {
-			App struct {
-				Feed struct {
-					AdDetails map[string]json.RawMessage `json:"adDetails"`
-				} `json:"feed"`
-			} `json:"app"`
+			Feed struct {
+				AdDetails map[string]json.RawMessage `json:"adDetails"`
+			} `json:"feed"`
 		} `json:"initialState"`
 	} `json:"props"`
 }
@@ -198,7 +196,7 @@ func (s *Lalafo) findAndParseJsonJsonOffer(doc *goquery.Document) Offer {
 	})
 
 	item := Item{}
-	for _, v := range foundJson.Props.InitialState.App.Feed.AdDetails {
+	for _, v := range foundJson.Props.InitialState.Feed.AdDetails {
 		/* this is hack, because we receive same response
 		"adDetails": {
 			"70426297": {"item": {}},
