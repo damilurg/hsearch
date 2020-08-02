@@ -79,6 +79,10 @@ func (b *Bot) searchCallback(query *tgbotapi.CallbackQuery) {
 		chat.Diesel = true
 	case "dieselOff":
 		chat.Diesel = false
+	case "houseOn":
+		chat.House = true
+	case "houseOff":
+		chat.House = false
 	case "lalafoOn":
 		chat.Lalafo = true
 	case "lalafoOff":

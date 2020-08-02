@@ -51,6 +51,7 @@ func NewManager(cnf *configs.Config, st Storage, bot Bot) *Manager {
 		cnf: cnf,
 		sitesForParse: []Site{
 			parser.DieselSite(),
+			parser.HouseSite(),
 			parser.LalafoSite(),
 		},
 	}

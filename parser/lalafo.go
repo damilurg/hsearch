@@ -157,7 +157,7 @@ func (o *Offer) rooms() string {
 }
 
 func (o *Offer) area() string {
-	return o.ParamsMap[areaId]
+	return fmt.Sprintf("%s м2", o.ParamsMap[areaId])
 }
 
 func (o *Offer) floor() string {

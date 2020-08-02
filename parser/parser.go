@@ -32,9 +32,8 @@ var (
 	textRegex = regexp.MustCompile(`[a-zA-Zа-яА-Я]+`)
 )
 
-// LoadNewOffers - получает страницу по URL, перебирает объявления и возвращает
-// список объявдений
-func LoadNewOffers(site Site) (map[uint64]string, error) {
+// FindOffersLinksOnSite - load new offers from the site and all find offers
+func FindOffersLinksOnSite(site Site) (map[uint64]string, error) {
 	doc, err := GetDocumentByUrl(site.Url())
 	if err != nil {
 		return nil, err

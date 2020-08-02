@@ -46,6 +46,7 @@ func (c *Connector) UpdateSettings(chat *structs.Chat) error {
 	UPDATE chat SET
 		enable = ?,
 		diesel = ?,
+		house = ?,
 		lalafo = ?,
 		photo = ?,
 		kgs = ?,
@@ -54,6 +55,7 @@ func (c *Connector) UpdateSettings(chat *structs.Chat) error {
 	`,
 		chat.Enable,
 		chat.Diesel,
+		chat.House,
 		chat.Lalafo,
 		chat.Photo,
 		chat.KGS,

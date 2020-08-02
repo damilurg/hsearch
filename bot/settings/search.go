@@ -16,6 +16,7 @@ func MainSearchHandler(msg *tgbotapi.Message, chat *structs.Chat) tgbotapi.Chatt
 	msgText := fmt.Sprintf(mainSearchText,
 		yesNo(chat.Enable),
 		yesNo(chat.Diesel),
+		yesNo(chat.House),
 		yesNo(chat.Lalafo),
 	)
 
@@ -23,13 +24,14 @@ func MainSearchHandler(msg *tgbotapi.Message, chat *structs.Chat) tgbotapi.Chatt
 	message.ReplyMarkup = getSearchKeyboard(
 		chat.Enable,
 		chat.Diesel,
+		chat.House,
 		chat.Lalafo,
 	)
 	message.ParseMode = tgbotapi.ModeMarkdown
 	return message
 }
 
-func getSearchKeyboard(search, diesel, lalafo bool) *tgbotapi.InlineKeyboardMarkup {
+func getSearchKeyboard(search, diesel, house, lalafo bool) *tgbotapi.InlineKeyboardMarkup {
 	keyboard := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(getButtonText(
@@ -44,6 +46,13 @@ func getSearchKeyboard(search, diesel, lalafo bool) *tgbotapi.InlineKeyboardMark
 				diesel,
 				"Не искать на diesel", "dieselOff",
 			)),
+			tgbotapi.NewInlineKeyboardButtonData(getButtonText(
+				"Искать на house", "houseOn",
+				house,
+				"Не искать на house", "houseOff",
+			)),
+		),
+		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(getButtonText(
 				"Искать на lalafo", "lalafoOn",
 				lalafo,

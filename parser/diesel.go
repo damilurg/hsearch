@@ -147,7 +147,7 @@ func (s *Diesel) parsePhone(doc *goquery.Document) string {
 func (s *Diesel) spanContains(doc *goquery.Document, text string) string {
 	nodes := doc.Find("span:contains('" + text + "')").Parent().Children().Nodes
 	if len(nodes) > 1 {
-		return goquery.NewDocumentFromNode(nodes[1]).Text()
+		return fmt.Sprintf("%s м2", goquery.NewDocumentFromNode(nodes[1]).Text())
 	}
 	return ""
 }
@@ -160,8 +160,8 @@ func (s *Diesel) parseBody(doc *goquery.Document) string {
 		body = goquery.NewDocumentFromNode(messages[0]).Text()
 		reg := regexp.MustCompile(`Сообщение отредактировал.*`)
 		body = reg.ReplaceAllString(body, "${1}")
-		body = strings.Replace(body, "Прикрепленные изображения", "", 1)
-		body = strings.Replace(body, "  ", "", 1)
+		body = strings.Replace(body, "Прикрепленные изображения", "", -1)
+		body = strings.Replace(body, "  ", "", -1)
 		body = strings.TrimSpace(body)
 	}
 	return body

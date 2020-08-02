@@ -12,9 +12,9 @@ import (
 //  press the back button, the key will be searched in the text and the menu
 //  will be called up by value.
 var BackFlowMap = map[string]string{
-	"Фильтры поиска":   "settings",
-	"Настройки поиска": "settings",
-	"Укажите суммы в":  "filters",
+	"Фильтры поиска":            "settings",
+	"Основные настройки поиска": "settings",
+	"Укажите суммы в":           "filters",
 }
 
 // buttons for configs
@@ -31,6 +31,7 @@ func MainSettingsHandler(msg *tgbotapi.Message, chat *structs.Chat) tgbotapi.Cha
 	msgText := fmt.Sprintf(mainSettingsText,
 		yesNo(chat.Enable),
 		yesNo(chat.Diesel),
+		yesNo(chat.House),
 		yesNo(chat.Lalafo),
 		yesNo(chat.Photo),
 		price(chat.KGS),

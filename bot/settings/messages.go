@@ -7,15 +7,15 @@ import (
 )
 
 // mainSettingsText - this is template for message that show all configs
-const mainSettingsText = `*Все настройки твоего бота*
-
+const mainSettingsText = `
 ` + mainSearchText + `
 
 `+ mainFiltersText
 
-const mainSearchText = `*Настройки поиска*
+const mainSearchText = `*Основные настройки поиска*
 Искать для тебя квартиры: %s
 Искать на elcat.diesel.kg: %s
+Искать на house.kg: %s
 Искать на lalafo.kg: %s`
 
 const mainFiltersText = `*Фильтры поиска*

@@ -14,6 +14,7 @@ const (
 
 	SiteDiesel = "diesel"
 	SiteLalafo = "lalafo"
+	SiteHouse = "house"
 )
 
 type (
@@ -34,6 +35,7 @@ type (
 		Enable bool
 		Diesel bool
 		Lalafo bool
+		House bool
 
 		// filters
 		Photo   bool

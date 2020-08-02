@@ -8,7 +8,7 @@ import (
 )
 
 // todo: refactor this
-// grabber - парсит удаленнвые ресурсы, находит предложения и пишет в хранилище,
+// grabber - парсит удаленные ресурсы, находит предложения и пишет в хранилище,
 // после чего трегерит broker
 func (m *Manager) grabber() {
 	// при первом запуске менеджера, он начнет первый парсинг через 2 секунды,
@@ -30,9 +30,9 @@ func (m *Manager) grabber() {
 
 func (m *Manager) grabbedOffers(site Site) {
 	log.Printf("[grabber] StartGrabber parse `%s`\n", site.Name())
-	offersLinks, err := parser.LoadNewOffers(site)
+	offersLinks, err := parser.FindOffersLinksOnSite(site)
 	if err != nil {
-		log.Printf("[grabber.LoadNewOffers] Error: %s\n", err)
+		log.Printf("[grabber.FindOffersLinksOnSite] Error: %s\n", err)
 		return
 	}
 

@@ -106,6 +106,8 @@ func (b *Bot) registerCallbacks() {
 	b.callbacks["searchOff"] = b.searchCallback
 	b.callbacks["dieselOn"] = b.searchCallback
 	b.callbacks["dieselOff"] = b.searchCallback
+	b.callbacks["houseOn"] = b.searchCallback
+	b.callbacks["houseOff"] = b.searchCallback
 	b.callbacks["lalafoOn"] = b.searchCallback
 	b.callbacks["lalafoOff"] = b.searchCallback
 

@@ -274,10 +274,7 @@ func (c *Connector) ReadNextOffer(chat *structs.Chat) (*structs.Offer, error) {
 		query.WriteString(priceFilter(chat.USD, chat.KGS))
 	}
 
-	if !chat.Diesel || !chat.Lalafo {
-		query.WriteString(siteFilter(chat.Diesel, chat.Lalafo))
-	}
-
+	query.WriteString(siteFilter(chat.Diesel, chat.House, chat.Lalafo))
 	query.WriteString(" 	ORDER BY of.created;")
 
 	err := c.DB.QueryRow(
@@ -329,14 +326,28 @@ func priceFilter(usd, kgs structs.Price) string {
 	return f.String()
 }
 
-func siteFilter(diesel, lalafo bool) string {
-	if !diesel && lalafo {
-		return fmt.Sprintf(" AND of.site == '%s'", structs.SiteLalafo)
+func siteFilter(diesel, house, lalafo bool) string {
+	var sites []string
+	if diesel {
+		sites = append(sites, structs.SiteDiesel)
 	}
-	if diesel && !lalafo {
-		return fmt.Sprintf(" AND of.site == '%s'", structs.SiteDiesel)
+	if house {
+		sites = append(sites, structs.SiteHouse)
 	}
-	return " AND of.site == ''"
+	if lalafo {
+		sites = append(sites, structs.SiteLalafo)
+	}
+	switch len(sites) {
+	case 1: return fmt.Sprintf(" AND of.site == '%s'", sites[0])
+	case 2:
+		sitesStr, sep := "", ""
+		for _, site := range sites {
+			sitesStr += fmt.Sprintf("%s'%s'", sep, site)
+			sep = ", "
+		}
+		return fmt.Sprintf(" AND of.site in (%s)", sitesStr)
+	}
+	return ""
 }
 
 func (c *Connector) ReadOfferDescription(msgId int, chatId int64) (uint64, string, error) {
