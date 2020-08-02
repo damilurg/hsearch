@@ -14,6 +14,12 @@ type (
 		ReadChatsForMatching(enable int) ([]*structs.Chat, error)
 		ReadNextOffer(chat *structs.Chat) (*structs.Offer, error)
 		CleanFromExistOrders(offers map[uint64]string, siteName string) error
+
+		// GarbageCollector methods
+		CleanExpiredOffers(expireDate int64) error
+		CleanExpiredImages(expireDate int64) error
+		CleanExpiredAnswers(expireDate int64) error
+		CleanExpiredTGMessages(expireDate int64) error
 	}
 
 	Bot interface {
@@ -37,7 +43,7 @@ type (
 	}
 )
 
-// NewManager - initializes the manager
+// NewManager - initializes the new background manager
 func NewManager(cnf *configs.Config, st Storage, bot Bot) *Manager {
 	return &Manager{
 		st:  st,
@@ -49,6 +55,12 @@ func NewManager(cnf *configs.Config, st Storage, bot Bot) *Manager {
 		},
 	}
 }
+
+// StartGarbageCollector - runs garbage collection in the form of old records that no longer make sense
+func (m *Manager) StartGarbageCollector() {
+	m.garbage()
+}
+
 
 // StartGrabber - starts the process of finding new offers
 func (m *Manager) StartGrabber() {

@@ -11,8 +11,7 @@ import (
 // CreateChat - creates a chat room and sets the default settings.
 func (c *Connector) CreateChat(id int64, username, title, cType string) error {
 	_, err := c.DB.Exec(
-		`INSERT INTO chat (id, username, title, enable, c_type, created)
-						VALUES (?, ?, ?, ?, ?, ?);`,
+		`INSERT INTO chat (id, username, title, enable, c_type, created) VALUES (?, ?, ?, ?, ?, ?);`,
 		id,
 		username,
 		title,

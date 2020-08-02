@@ -413,3 +413,21 @@ func (c *Connector) ReadOfferImages(msgId int, chatId int64) (uint64, []string, 
 
 	return offerId, images, nil
 }
+
+// CleanExpiredOffers - just clean offer table
+func (c *Connector) CleanExpiredOffers(expireDate int64) error {
+	_, err := c.DB.Exec(`DELETE FROM offer WHERE created < ?`, expireDate)
+	return err
+}
+
+// CleanExpiredImages - just clean image table
+func (c *Connector) CleanExpiredImages(expireDate int64) error {
+	_, err := c.DB.Exec(`DELETE FROM image WHERE created < ?`, expireDate)
+	return err
+}
+
+// CleanExpiredAnswers - just clean answer table
+func (c *Connector) CleanExpiredAnswers(expireDate int64) error {
+	_, err := c.DB.Exec(`DELETE FROM answer WHERE created < ?`, expireDate)
+	return err
+}

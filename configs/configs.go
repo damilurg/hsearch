@@ -24,6 +24,8 @@ type Config struct {
 	FrequencyTime time.Duration
 	SkipDelayTime time.Duration
 	RelevanceTime time.Duration
+
+	ExpireDays int
 }
 
 // GetConf - returns the application configuration
@@ -33,6 +35,7 @@ func GetConf() (*Config, error) {
 		ParserFrequency: "1m",
 		OrderSkipDelay:  "3m",
 		OrderRelevance:  "2m",
+		ExpireDays:      14,
 	}
 
 	err := env.Parse(cfg)

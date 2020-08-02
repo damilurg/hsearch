@@ -18,8 +18,7 @@ func (c *Connector) Feedback(chat int64, username, body string) error {
 //  save this message for subsequent removal from chat, if need.
 func (c *Connector) SaveMessage(msgId int, offerId uint64, chat int64, kind string) error {
 	_, err := c.DB.Exec(
-		`INSERT INTO tg_messages (message_id, offer_id, kind, chat, created)
- 				VALUES (?, ?, ?, ?, ?);`,
+		`INSERT INTO tg_messages (message_id, offer_id, kind, chat, created) VALUES (?, ?, ?, ?, ?);`,
 		msgId,
 		offerId,
 		kind,
@@ -27,5 +26,11 @@ func (c *Connector) SaveMessage(msgId int, offerId uint64, chat int64, kind stri
 		time.Now().Unix(),
 	)
 
+	return err
+}
+
+// CleanExpiredTGMessages - just clean tg_messages table
+func (c *Connector) CleanExpiredTGMessages(expireDate int64) error {
+	_, err := c.DB.Exec(`DELETE FROM tg_messages WHERE created < ?`, expireDate)
 	return err
 }
