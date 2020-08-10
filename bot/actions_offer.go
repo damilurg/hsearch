@@ -9,7 +9,6 @@ import (
 )
 
 var (
-	skipButton        = tgbotapi.NewInlineKeyboardButtonData("Пропустить", "skip")
 	dislikeButton     = tgbotapi.NewInlineKeyboardButtonData("Точно нет!", "dislike")
 	descriptionButton = tgbotapi.NewInlineKeyboardButtonData("Описание", "description")
 	photoButton       = tgbotapi.NewInlineKeyboardButtonData("Фото", "photo")
@@ -34,25 +33,7 @@ func getKeyboard(offer *structs.Offer) tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(row1, row2)
 }
 
-// skip - обраьатывает нажатие на кнопку "Пропустить"
-func (b *Bot) skip(query *tgbotapi.CallbackQuery) {
-	err := b.storage.Skip(query.Message.MessageID, query.Message.Chat.ID)
-	if err != nil {
-		log.Println("[skip.Skip] error:", err)
-		return
-	}
-
-	_, err = b.bot.AnswerCallbackQuery(tgbotapi.NewCallback(
-		query.ID, "Покажу позже",
-	))
-
-	if err != nil {
-		log.Println("[skip.AnswerCallbackQuery] error:", err)
-	}
-}
-
-// dislike - this button delete order from chat and no more show to user that
-// order.
+// dislike - this button delete order from chat and no more show to user that order
 func (b *Bot) dislike(query *tgbotapi.CallbackQuery) {
 	messagesIds, err := b.storage.Dislike(
 		query.Message.MessageID,
@@ -172,7 +153,7 @@ func (b *Bot) photo(query *tgbotapi.CallbackQuery) {
 }
 
 // getSeparatedAlbums - separate images array to 10-items albums. Telegram API
-// has limit: `max images in images album is 10`
+//  has limit: `max images in images album is 10`
 func getSeparatedAlbums(images []string) [][]string {
 	maxImages := 10
 	albums := make([][]string, 0, (len(images)+maxImages-1)/maxImages)

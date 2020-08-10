@@ -212,30 +212,6 @@ func (c *Connector) Dislike(msgId int, chatId int64) ([]int, error) {
 	return msgIds, err
 }
 
-func (c *Connector) Skip(msgId int, chatId int64) error {
-	offerId := uint64(0)
-	err := c.DB.QueryRow(
-		"SELECT offer_id FROM tg_messages WHERE message_id = ? AND chat = ?;",
-		msgId,
-		chatId,
-	).Scan(
-		&offerId,
-	)
-	if err != nil {
-		return err
-	}
-
-	skipTime := time.Now().Add(c.skipDelayTime).Unix()
-	_, err = c.DB.Exec(
-		"INSERT INTO answer (chat, offer_id, skip, created) VALUES (?, ?, ?, ?);",
-		chatId,
-		offerId,
-		skipTime,
-		time.Now().Unix(),
-	)
-	return err
-}
-
 func (c *Connector) ReadNextOffer(chat *structs.Chat) (*structs.Offer, error) {
 	offer := new(structs.Offer)
 	now := time.Now()

@@ -5,7 +5,7 @@ create table answer
     created  integer not null,
     chat     integer not null,
     offer_id integer not null,
-    -- sqlite не поддерживает boolean тип, по этому спользуется integer 1/0
+    -- sqlite не поддерживает boolean тип, по этому используется integer 1/0
     -- в других бд, boolean выглядит как tinyint, то есть 1/0, так что это норм
     like     integer default 0,
     dislike  integer default 0,

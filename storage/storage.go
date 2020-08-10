@@ -15,7 +15,6 @@ type (
 	// Connector - the interface to the storage.
 	Connector struct {
 		DB            *sql.DB
-		skipDelayTime time.Duration
 		relevanceTime time.Duration
 	}
 )
@@ -38,7 +37,6 @@ func New(cnf *configs.Config) (*Connector, error) {
 
 	return &Connector{
 		DB:            db,
-		skipDelayTime: cnf.SkipDelayTime,
 		relevanceTime: cnf.RelevanceTime,
 	}, nil
 }

@@ -73,7 +73,6 @@ type (
 		Offer   uint64
 		Like    bool
 		Dislike bool
-		Skip    uint64
 	}
 
 	// Feedback - a feedback structure hoping to get bug reports and not

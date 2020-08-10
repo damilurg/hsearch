@@ -16,13 +16,11 @@ type Config struct {
 	Release         string
 	SentryDSN       string `env:"SENTRY_DSN"`
 	ParserFrequency string `env:"PARSER_FREQUENCY"`
-	OrderSkipDelay  string `env:"ORDER_SKIP_DELAY"`
 	OrderRelevance  string `env:"ORDER_RELEVANCE"`
 	TelegramToken   string `env:"T_TOKEN"`
 	TelegramChatId  int64  `env:"T_CHAT_ID"`
 
 	FrequencyTime time.Duration
-	SkipDelayTime time.Duration
 	RelevanceTime time.Duration
 
 	ExpireDays int
@@ -33,7 +31,6 @@ func GetConf() (*Config, error) {
 	cfg := &Config{
 		Release:         Release,
 		ParserFrequency: "1m",
-		OrderSkipDelay:  "3m",
 		OrderRelevance:  "2m",
 		ExpireDays:      14,
 	}
@@ -57,12 +54,6 @@ func GetConf() (*Config, error) {
 
 	// RelevanceTime
 	cfg.FrequencyTime, err = time.ParseDuration(cfg.ParserFrequency)
-	if err != nil {
-		return nil, err
-	}
-
-	// SkipDelayTime
-	cfg.SkipDelayTime, err = time.ParseDuration(cfg.OrderSkipDelay)
 	if err != nil {
 		return nil, err
 	}

@@ -14,7 +14,6 @@ import (
 type (
 	Storage interface {
 		Dislike(msgId int, chatId int64) ([]int, error)
-		Skip(msgId int, chatId int64) error
 		Feedback(chat int64, username, body string) error
 
 		SaveMessage(msgId int, offerId uint64, chat int64, kind string) error
@@ -91,7 +90,6 @@ func (b *Bot) Start() {
 // registerCallbacks - register all callbacks
 func (b *Bot) registerCallbacks() {
 	// order callbacks
-	b.callbacks["skip"] = b.skip
 	b.callbacks["dislike"] = b.dislike
 	b.callbacks["description"] = b.description
 	b.callbacks["photo"] = b.photo
