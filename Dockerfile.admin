@@ -9,6 +9,6 @@ COPY admin/requirements.txt /srv/admin/requirements.txt
 RUN pip install -r /srv/admin/requirements.txt
 
 COPY admin /srv/admin
-RUN python manage.py collectstatic --noinput
+RUN DJANGO_DEBUG=True python manage.py collectstatic --noinput
 
 CMD ["uwsgi","--http-socket", ":8080", "--wsgi-file", "config/wsgi.py", "--processes", "4", "--uid", "root", "--enable-threads", "--static-map=/static=/srv/admin/static"]
