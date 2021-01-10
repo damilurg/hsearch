@@ -26,6 +26,16 @@ func (c *Connector) CreateChat(ctx context.Context, id int64, username, title, c
 
 // DeleteChat - creates a chat room and sets the default settings.
 func (c *Connector) DeleteChat(ctx context.Context, id int64) error {
+	existId := 0
+	if err := c.Conn.QueryRow(ctx, "SELECT id FROM chat WHERE id = $1 LIMIT 1", id).Scan(&existId); err != nil {
+		return err
+	}
+
+	if existId != 0 {
+		_, err := c.Conn.Exec(ctx, "UPDATE chat SET enable = false WHERE id = $1", id)
+		return err
+	}
+
 	_, err := c.Conn.Exec(ctx, "INSERT INTO chat (id, enable) VALUES ($1, $2)", id, false)
 	return err
 }

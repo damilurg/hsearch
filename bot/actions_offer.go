@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/getsentry/sentry-go"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 
 	"github.com/comov/hsearch/structs"
@@ -42,6 +43,7 @@ func (b *Bot) dislike(ctx context.Context, query *tgbotapi.CallbackQuery) {
 		query.Message.Chat.ID,
 	)
 	if err != nil {
+		sentry.CaptureException(err)
 		log.Println("[dislike.Dislike] error:", err)
 		return
 	}
@@ -51,6 +53,7 @@ func (b *Bot) dislike(ctx context.Context, query *tgbotapi.CallbackQuery) {
 			tgbotapi.NewDeleteMessage(query.Message.Chat.ID, id),
 		)
 		if err != nil {
+			sentry.CaptureException(err)
 			log.Println("[dislike.DeleteMessage] error:", err)
 		}
 	}
@@ -59,8 +62,8 @@ func (b *Bot) dislike(ctx context.Context, query *tgbotapi.CallbackQuery) {
 		query.ID, "Больше никогда не покажу",
 	))
 	if err != nil {
+		sentry.CaptureException(err)
 		log.Println("[dislike.AnswerCallbackQuery] error:", err)
-		return
 	}
 }
 
@@ -72,6 +75,7 @@ func (b *Bot) description(ctx context.Context, query *tgbotapi.CallbackQuery) {
 		query.Message.Chat.ID,
 	)
 	if err != nil {
+		sentry.CaptureException(err)
 		log.Println("[description.ReadOfferDescription] error:", err)
 		return
 	}
@@ -81,6 +85,7 @@ func (b *Bot) description(ctx context.Context, query *tgbotapi.CallbackQuery) {
 
 	send, err := b.Send(message)
 	if err != nil {
+		sentry.CaptureException(err)
 		log.Println("[description.Send] error:", err)
 	}
 
@@ -92,6 +97,7 @@ func (b *Bot) description(ctx context.Context, query *tgbotapi.CallbackQuery) {
 		structs.KindDescription,
 	)
 	if err != nil {
+		sentry.CaptureException(err)
 		log.Println("[photo.SaveMessage] error:", err)
 	}
 }
@@ -100,14 +106,16 @@ func (b *Bot) description(ctx context.Context, query *tgbotapi.CallbackQuery) {
 func (b *Bot) photo(ctx context.Context, query *tgbotapi.CallbackQuery) {
 	offerId, images, err := b.storage.ReadOfferImages(ctx, query.Message.MessageID, query.Message.Chat.ID)
 	if err != nil {
+		sentry.CaptureException(err)
 		log.Println("[photo.ReadOfferDescription] error:", err)
 		return
 	}
 
 	waitMessage := tgbotapi.Message{}
-	if len(images) != 0 {
+	if len(images) != 0 && query.Message.Chat.Type != "channel" {
 		waitMessage, err = b.Send(tgbotapi.NewMessage(query.Message.Chat.ID, WaitPhotoMessage(len(images))))
 		if err != nil {
+			sentry.CaptureException(err)
 			log.Println("[photo.Send] error:", err)
 		}
 	}
@@ -123,6 +131,7 @@ func (b *Bot) photo(ctx context.Context, query *tgbotapi.CallbackQuery) {
 
 		messages, err := b.SendGroupPhotos(message)
 		if err != nil {
+			sentry.CaptureException(err)
 			log.Println("[photo.Send] sending album error:", err)
 		}
 
@@ -135,15 +144,17 @@ func (b *Bot) photo(ctx context.Context, query *tgbotapi.CallbackQuery) {
 				structs.KindPhoto,
 			)
 			if err != nil {
+				sentry.CaptureException(err)
 				log.Println("[photo.SaveMessage] error:", err)
 			}
 		}
 	}
 
-	if len(images) != 0 {
+	if len(images) != 0 && query.Message.Chat.Type != "channel" {
 		_, err := b.bot.DeleteMessage(tgbotapi.NewDeleteMessage(query.Message.Chat.ID, waitMessage.MessageID))
 
 		if err != nil {
+			sentry.CaptureException(err)
 			log.Println("[photo.DeleteMessage] error:", err)
 		}
 	}

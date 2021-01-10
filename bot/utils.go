@@ -69,17 +69,40 @@ func buildParams(config tgbotapi.MediaGroupConfig) (url.Values, error) {
 
 // SendOffer - send the offer to a chat and save the delivery report to a chat
 //  room
-func (b *Bot) SendOffer(ctx context.Context, offer *structs.Offer, chatId int64) error {
-	message := tgbotapi.NewMessage(chatId, DefaultMessage(offer))
+func (b *Bot) SendOffer(ctx context.Context, offer *structs.Offer, chat *structs.Chat) error {
+	message := tgbotapi.NewMessage(chat.Id, DefaultMessage(offer))
 	message.DisableWebPagePreview = true
 	message.ParseMode = tgbotapi.ModeMarkdown
-	message.ReplyMarkup = getKeyboard(offer)
 
-	send, err := b.Send(message)
+	if !chat.IsChannel() {
+		message.ReplyMarkup = getKeyboard(offer)
+	}
+
+	msg, err := b.Send(message)
 	if err != nil {
 		return err
 	}
-	return b.storage.SaveMessage(ctx, send.MessageID, offer.Id, chatId, structs.KindOffer)
+
+	err = b.storage.SaveMessage(ctx, msg.MessageID, offer.Id, chat.Id, structs.KindOffer)
+	if err != nil {
+		return err
+	}
+
+	if !chat.IsChannel() {
+		return nil
+	}
+
+	query := &tgbotapi.CallbackQuery{
+		Message: &tgbotapi.Message{
+			MessageID: msg.MessageID,
+			Chat: &tgbotapi.Chat{
+				ID:   chat.Id,
+				Type: "channel",
+			},
+		},
+	}
+	b.photo(ctx, query)
+	return nil
 }
 
 func (b *Bot) addWaitCallback(c int64, answer answer) {

@@ -2,6 +2,7 @@ package bot
 
 import (
 	"context"
+	"github.com/comov/hsearch/bot/settings"
 	"log"
 	"sync"
 	"time"
@@ -88,6 +89,10 @@ func (b *Bot) Start() {
 		if update.Message != nil {
 			go b.messageHandler(ctx, update)
 		}
+
+		if update.ChannelPost != nil {
+			go b.channelHandler(ctx, update)
+		}
 	}
 }
 
@@ -132,16 +137,16 @@ func (b *Bot) messageHandler(ctx context.Context, update tgbotapi.Update) {
 		msg := ""
 		switch update.Message.Command() {
 		case "start":
-			msg = b.start(ctx, update.Message)
+			msg = b.start(ctx, update.Message.Chat)
 		case "stop":
-			msg = b.stop(ctx, update.Message)
+			msg = b.stop(ctx, update.Message.Chat)
 		case "help":
 			msg = b.help(update.Message)
 		case "settings":
 			b.callbacks["settings"](ctx, &tgbotapi.CallbackQuery{Message: update.Message})
 			return
 		case "feedback":
-			msg = b.feedback(ctx, update.Message)
+			msg = b.feedback(ctx, update.Message.Chat)
 		default:
 			msg = "Нет среди доступных команд :("
 		}
@@ -149,11 +154,53 @@ func (b *Bot) messageHandler(ctx context.Context, update tgbotapi.Update) {
 		message := tgbotapi.NewMessage(update.Message.Chat.ID, msg)
 		_, err := b.Send(message)
 		if err != nil {
-			log.Println("[bot.Send] error: ", err)
+			sentry.CaptureException(err)
+			log.Println("[messageHandler.bot.Send] error: ", err)
 		}
 		return
 	}
 	b.answerListener(ctx, update.Message)
+}
+
+func (b *Bot) channelHandler(ctx context.Context, update tgbotapi.Update) {
+	if !update.ChannelPost.IsCommand() {
+		return
+	}
+
+	msg := ""
+	switch update.ChannelPost.Command() {
+	case "start":
+		msg = b.start(ctx, update.ChannelPost.Chat)
+	case "stop":
+		msg = b.stop(ctx, update.ChannelPost.Chat)
+	case "help":
+		msg = b.help(update.ChannelPost)
+	case "settings":
+		chat, err := b.storage.ReadChat(ctx, update.ChannelPost.Chat.ID)
+		if err != nil {
+			sentry.CaptureException(err)
+			log.Println("[channelHandler.settings.ReadChat] error:", err)
+			return
+		}
+
+		_, err = b.Send(settings.MainSettingsHandler(update.ChannelPost, chat))
+		if err != nil {
+			sentry.CaptureException(err)
+			log.Println("[channelHandler.settings.Send] error:", err)
+		}
+		return
+	case "feedback":
+		msg = b.feedback(ctx, update.ChannelPost.Chat)
+	default:
+		msg = "Нет среди доступных команд"
+	}
+
+	message := tgbotapi.NewMessage(update.ChannelPost.Chat.ID, msg)
+	_, err := b.Send(message)
+	if err != nil {
+		sentry.CaptureException(err)
+		log.Println("[channelHandler.bot.Send] error: ", err)
+	}
 }
 
 // answerListener - if we need wait answer from some chat, we add waite command

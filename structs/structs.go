@@ -8,6 +8,11 @@ import (
 )
 
 const (
+	TypePrivate    = "private"
+	TypeGroup      = "group"
+	TypeSupergroup = "supergroup"
+	TypeChannel    = "channel"
+
 	KindOffer       = "offer"
 	KindPhoto       = "photo"
 	KindDescription = "description"
@@ -101,4 +106,8 @@ func (p *Price) Scan(value interface{}) error {
 	to, _ := strconv.Atoi(prices[1])
 	*p = Price{from, to}
 	return nil
+}
+
+func (p *Chat) IsChannel() bool {
+	return p.Type == TypeChannel
 }

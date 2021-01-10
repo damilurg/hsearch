@@ -68,7 +68,7 @@ func (m *Manager) matching(ctx context.Context, chat *structs.Chat) {
 		return
 	}
 
-	err = m.bot.SendOffer(ctx, offer, chat.Id)
+	err = m.bot.SendOffer(ctx, offer, chat)
 	if err != nil {
 		if strings.Contains(err.Error(), "blocked by the user") {
 			chat.Enable = false

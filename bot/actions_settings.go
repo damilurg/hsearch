@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/getsentry/sentry-go"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 
 	"github.com/comov/hsearch/bot/settings"
@@ -40,6 +41,7 @@ func (b *Bot) settingsCallback(ctx context.Context, query *tgbotapi.CallbackQuer
 
 	_, err = b.Send(settings.MainSettingsHandler(query.Message, chat))
 	if err != nil {
+		sentry.CaptureException(err)
 		log.Println("[settingsCallback.Send] error:", err)
 	}
 }
@@ -90,6 +92,7 @@ func (b *Bot) searchCallback(ctx context.Context, query *tgbotapi.CallbackQuery)
 
 	_, err = b.Send(settings.MainSearchHandler(query.Message, chat))
 	if err != nil {
+		sentry.CaptureException(err)
 		log.Println("[searchCallback.Send] error:", err)
 	}
 }
@@ -104,6 +107,7 @@ func (b *Bot) filtersCallback(ctx context.Context, query *tgbotapi.CallbackQuery
 
 	_, err = b.Send(settings.MainFiltersHandler(query.Message, chat))
 	if err != nil {
+		sentry.CaptureException(err)
 		log.Println("[filtersCallback.Send] error:", err)
 	}
 }
@@ -130,6 +134,7 @@ func (b *Bot) withPhotoCallback(ctx context.Context, query *tgbotapi.CallbackQue
 
 	_, err = b.Send(settings.MainFiltersHandler(query.Message, chat))
 	if err != nil {
+		sentry.CaptureException(err)
 		log.Println("[withPhotoCallback.Send] error:", err)
 	}
 }
@@ -137,6 +142,7 @@ func (b *Bot) withPhotoCallback(ctx context.Context, query *tgbotapi.CallbackQue
 func (b *Bot) priceCallback(_ context.Context, query *tgbotapi.CallbackQuery) {
 	_, err := b.Send(settings.FilterPriceHandler(query.Message, query.Data))
 	if err != nil {
+		sentry.CaptureException(err)
 		log.Println("[priceCallback.Send] error:", err)
 		return
 	}
