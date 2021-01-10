@@ -3,21 +3,26 @@ package parser
 import (
 	"context"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/comov/hsearch/structs"
 	"log"
 	"net/http"
 	"net/url"
 	"regexp"
 	"sync"
 	"time"
+
+	"github.com/PuerkitoBio/goquery"
+
+	"github.com/comov/hsearch/structs"
 )
 
 type (
 	Site interface {
 		FullHost() string
 		Url() string
+		Name() string
 		Selector() string
+
+		GetOffersMap(doc *goquery.Document) OffersMap
 		IdFromHref(href string) (uint64, error)
 		ParseNewOffer(href string, exId uint64, doc *goquery.Document) *structs.Offer
 	}
@@ -27,40 +32,30 @@ type (
 //  [NOT]: Тема-негативка. Только факты. Арендаторам и Арендодателям внимание!
 const negativeTheme = 2477961
 
+type OffersMap = map[uint64]string
+
 var (
 	intRegex  = regexp.MustCompile(`\d+`)
 	textRegex = regexp.MustCompile(`[a-zA-Zа-яА-Я]+`)
 )
 
 // FindOffersLinksOnSite - load new offers from the site and all find offers
-func FindOffersLinksOnSite(site Site) (map[uint64]string, error) {
+func FindOffersLinksOnSite(site Site) (OffersMap, error) {
 	doc, err := GetDocumentByUrl(site.Url())
 	if err != nil {
 		return nil, err
 	}
 
-	offers := make(map[uint64]string)
+	offers := make(OffersMap)
 
-	doc.Find(site.Selector()).Each(func(i int, s *goquery.Selection) {
-		href, ok := s.Attr("href")
-		if !ok {
-			return
-		}
-
-		offerId, err := site.IdFromHref(href)
-		if err != nil {
-			log.Println("Can't get Id from href with an error", err)
-			return
-		}
-
-		u, err := url.Parse(href)
-		if err != nil {
-			log.Println("Can't parse href to error with an error", err)
-			return
-		}
-
-		offers[offerId] = fmt.Sprintf("%s%s", site.FullHost(), u.RequestURI())
-	})
+	switch site.Name() {
+	case structs.SiteLalafo:
+		offers = site.GetOffersMap(doc)
+	case structs.SiteHouse:
+		offers = site.GetOffersMap(doc)
+	default:
+		offers = DefaultParser(site, doc)
+	}
 
 	delete(offers, negativeTheme)
 	return offers, nil
@@ -145,4 +140,30 @@ func GetDocumentByUrl(url string) (*goquery.Document, error) {
 	}
 
 	return goquery.NewDocumentFromReader(res.Body)
+}
+
+func DefaultParser(site Site, doc *goquery.Document) OffersMap {
+	var mapResponse = make(OffersMap, 0)
+	doc.Find(site.Selector()).Each(func(i int, s *goquery.Selection) {
+		href, ok := s.Attr("href")
+		if !ok {
+			log.Println("Can't find href")
+			return
+		}
+
+		offerId, err := site.IdFromHref(href)
+		if err != nil {
+			log.Println("Can't get Id from href with an error", err)
+			return
+		}
+
+		u, err := url.Parse(href)
+		if err != nil {
+			log.Println("Can't parse href to error with an error", err)
+			return
+		}
+
+		mapResponse[offerId] = fmt.Sprintf("%s%s", site.FullHost(), u.RequestURI())
+	})
+	return mapResponse
 }

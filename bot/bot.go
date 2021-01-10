@@ -2,15 +2,15 @@ package bot
 
 import (
 	"context"
-	"github.com/getsentry/sentry-go"
 	"log"
 	"sync"
 	"time"
 
+	"github.com/getsentry/sentry-go"
+	"github.com/go-telegram-bot-api/telegram-bot-api"
+
 	"github.com/comov/hsearch/configs"
 	"github.com/comov/hsearch/structs"
-
-	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 type (

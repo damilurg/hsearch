@@ -5,10 +5,10 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/comov/hsearch/configs"
-
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/jackc/tern/migrate"
+
+	"github.com/comov/hsearch/configs"
 )
 
 type (

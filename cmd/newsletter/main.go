@@ -7,10 +7,11 @@ import (
 	"log"
 	"os"
 
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+
 	"github.com/comov/hsearch/bot"
 	"github.com/comov/hsearch/configs"
 	"github.com/comov/hsearch/storage"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 var releases map[string]string

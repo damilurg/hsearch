@@ -2,11 +2,12 @@ package background
 
 import (
 	"context"
+
+	"github.com/PuerkitoBio/goquery"
+
 	"github.com/comov/hsearch/configs"
 	"github.com/comov/hsearch/parser"
 	"github.com/comov/hsearch/structs"
-
-	"github.com/PuerkitoBio/goquery"
 )
 
 type (
@@ -35,6 +36,8 @@ type (
 		FullHost() string
 		Url() string
 		Selector() string
+
+		GetOffersMap(doc *goquery.Document) parser.OffersMap
 		IdFromHref(href string) (uint64, error)
 		ParseNewOffer(href string, exId uint64, doc *goquery.Document) *structs.Offer
 	}

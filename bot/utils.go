@@ -9,9 +9,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/comov/hsearch/structs"
-
 	"github.com/go-telegram-bot-api/telegram-bot-api"
+
+	"github.com/comov/hsearch/structs"
 )
 
 // SendGroupPhotos - sends a group of photos to a chat room, but unlike Send,

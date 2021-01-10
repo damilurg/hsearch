@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/comov/hsearch/structs"
-
 	"github.com/jackc/pgx/v4"
+
+	"github.com/comov/hsearch/structs"
 )
 
 // WriteOffer - records Offer in the database with the pictures and returns Id

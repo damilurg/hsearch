@@ -45,6 +45,10 @@ func (s *Diesel) Selector() string {
 	return s.MainSelector
 }
 
+func (s *Diesel) GetOffersMap(doc *goquery.Document) OffersMap {
+	return OffersMap{}
+}
+
 // IdFromHref - find offer Id from URL
 func (s *Diesel) IdFromHref(href string) (uint64, error) {
 	urlPath, err := url.Parse(href)

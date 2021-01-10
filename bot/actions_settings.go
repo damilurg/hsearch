@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+
 	"github.com/comov/hsearch/bot/settings"
 	"github.com/comov/hsearch/structs"
-
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 // answer - when we ask a question, we expect an answer. This structure stores

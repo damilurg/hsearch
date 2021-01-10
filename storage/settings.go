@@ -3,9 +3,9 @@ package storage
 import (
 	"context"
 
-	"github.com/comov/hsearch/structs"
-
 	"github.com/jackc/pgx/v4"
+
+	"github.com/comov/hsearch/structs"
 )
 
 // StartSearch - register new user or group if not exist or enable receive new

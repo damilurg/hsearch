@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/getsentry/sentry-go"
 
 	"github.com/comov/hsearch/structs"
 )
@@ -19,12 +20,27 @@ type Lalafo struct {
 	MainSelector string
 }
 
+type MainPageResponse struct {
+	Props struct {
+		InitialState struct {
+			Listing struct {
+				ListingFeed struct {
+					Items []struct {
+						ID  uint64 `json:"id"`
+						URL string `json:"url"`
+					} `json:"items"`
+				} `json:"listingFeed"`
+			} `json:"listing"`
+		} `json:"initialState"`
+	} `json:"props"`
+}
+
 func LalafoSite() *Lalafo {
 	return &Lalafo{
 		Site:         structs.SiteLalafo,
 		Host:         "https://lalafo.kg",
 		Target:       "https://lalafo.kg/kyrgyzstan/kvartiry/arenda-kvartir/dolgosrochnaya-arenda-kvartir",
-		MainSelector: ".adTile-mainInfo",
+		MainSelector: "#__NEXT_DATA__",
 	}
 }
 
@@ -42,6 +58,26 @@ func (s *Lalafo) Url() string {
 
 func (s *Lalafo) Selector() string {
 	return s.MainSelector
+}
+
+func (s *Lalafo) GetOffersMap(doc *goquery.Document) OffersMap {
+	var mapResponse = make(OffersMap, 0)
+
+	doc.Find("#__NEXT_DATA__").Each(func(i int, _s *goquery.Selection) {
+		var fromTheNext = new(MainPageResponse)
+
+		err := json.Unmarshal([]byte(_s.Text()), fromTheNext)
+		if err != nil {
+			sentry.CaptureException(err)
+			return
+		}
+
+		for _, i := range fromTheNext.Props.InitialState.Listing.ListingFeed.Items {
+			mapResponse[i.ID] = fmt.Sprintf("%s%s", s.FullHost(), i.URL)
+		}
+	})
+
+	return mapResponse
 }
 
 // IdFromHref - find offer Id from URL

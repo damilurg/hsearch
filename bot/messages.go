@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/comov/hsearch/structs"
-
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+
+	"github.com/comov/hsearch/structs"
 )
 
 const helpMessage = `

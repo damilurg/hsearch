@@ -16,7 +16,7 @@ create table offer
     room_type    varchar(100) default '',
     site         varchar(20)  default '',
     floor        varchar(20)  default '',
-    district     varchar(100)  default ''
+    district     varchar(100) default ''
 );
 
 create unique index offer_id_uindex
