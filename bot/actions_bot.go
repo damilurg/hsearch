@@ -33,7 +33,7 @@ func (b *Bot) start(ctx context.Context, m *tgbotapi.Message) string {
 	}
 	err = b.storage.CreateChat(ctx, m.Chat.ID, m.Chat.UserName, title, m.Chat.Type)
 	if err != nil {
-		log.Println("[start.StopSearch] error:", err)
+		log.Println("[start.CreateChat] error:", err)
 		return "Что-то сломалось. Со мной такое впервые... 🤔"
 	}
 	return "Теперь я буду искать для тебя квартиры"

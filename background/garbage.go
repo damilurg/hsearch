@@ -8,8 +8,9 @@ import (
 	"github.com/getsentry/sentry-go"
 )
 
-func (m *Manager) garbage(ctx context.Context) {
+func (m *Manager) garbage() {
 	expireDate := time.Now().AddDate(0, 0, m.cnf.ExpireDays*-1).Unix()
+	ctx := context.Background()
 
 	log.Printf("[garbage] StartGarbageCollector Manager\n")
 	err := m.st.CleanExpiredOffers(ctx, expireDate)

@@ -20,6 +20,7 @@ type Config struct {
 	PgPassword      string `env:"GO_DB_PASSWORD"`
 	PgHost          string `env:"GO_DB_HOST"`
 	PgPort          int32  `env:"GO_DB_PORT"`
+	HTTPBind        string `env:"HTTP_BIND"`
 
 	FrequencyTime time.Duration
 	RelevanceTime time.Duration
@@ -36,6 +37,7 @@ func GetConf() (*Config, error) {
 		PgPassword:      "hsearch",
 		PgHost:          "localhost",
 		PgPort:          5432,
+		HTTPBind:        ":3300",
 		ExpireDays:      7,
 	}
 
@@ -45,7 +47,7 @@ func GetConf() (*Config, error) {
 	}
 
 	err = sentry.Init(sentry.ClientOptions{
-		SampleRate:  0.5,
+		SampleRate: 0.5,
 	})
 
 	if err != nil {

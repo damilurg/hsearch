@@ -8,21 +8,6 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
-// StopSearch - disable receive message about new offers.
-func (c *Connector) StopSearch(ctx context.Context, id int64) error {
-	resp, err := c.Conn.Exec(ctx, "UPDATE chat SET enable = 0 WHERE id = $1;", id)
-	if err != nil {
-		return err
-	}
-
-	affect := resp.RowsAffected()
-	if affect == 0 {
-		return pgx.ErrNoRows
-	}
-
-	return nil
-}
-
 // StartSearch - register new user or group if not exist or enable receive new
 //  offers.
 func (c *Connector) StartSearch(ctx context.Context, id int64, username, title, cType string) error {

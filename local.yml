@@ -20,7 +20,7 @@ services:
       context: .
     container_name: hsearch_admin
     environment:
-      DJANGO_DEBUG: true
+      DJANGO_DEBUG: 'true'
       DJANGO_DB_HOST: hsearch_db
       DJANGO_DB_PORT: 65432
     ports:

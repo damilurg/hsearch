@@ -70,9 +70,10 @@ func main() {
 	telegramBot := bot.NewTelegramBot(cnf, db)
 
 	bgm := background.NewManager(cnf, db, telegramBot)
-	go bgm.StartGarbageCollector(ctx)
-	go bgm.StartGrabber(ctx)
-	go bgm.StartMatcher(ctx)
+	go bgm.StartGarbageCollector()
+	go bgm.StartGrabber()
+	go bgm.StartMatcher()
+	go bgm.StartApi()
 
 	telegramBot.Start()
 }

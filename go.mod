@@ -11,8 +11,10 @@ require (
 	github.com/jackc/pgx/v4 v4.8.1
 	github.com/jackc/tern v1.12.1
 	github.com/joho/godotenv v1.3.0
+	github.com/julienschmidt/httprouter v1.2.0
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pty v1.1.8 // indirect
+	github.com/nicklaw5/go-respond v0.0.0-20190722175312-54f5cd3d2246
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
 	go.uber.org/multierr v1.5.0 // indirect

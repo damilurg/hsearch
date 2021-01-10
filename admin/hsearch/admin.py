@@ -178,12 +178,12 @@ class AnswerAdmin(admin.ModelAdmin):
     ]
 
     def chat_link(self, obj: Feedback):
-        return SafeString(f'<a href="/admin/hsearch/chat/{obj.chat.id}/">{obj.chat}</a>')
+        return SafeString(f'<a href="/hsearch/hsearch/chat/{obj.chat.id}/">{obj.chat}</a>')
 
     chat_link.short_description = 'chat'
 
     def offer_link(self, obj: Feedback):
-        return SafeString(f'<a href="/admin/hsearch/offer/{obj.offer.id}/">{obj.offer}</a>')
+        return SafeString(f'<a href="/hsearch/hsearch/offer/{obj.offer.id}/">{obj.offer}</a>')
 
     offer_link.short_description = 'offer'
 
@@ -216,7 +216,7 @@ class FeedbackAdmin(admin.ModelAdmin):
     telegram_link.short_description = 'telegram'
 
     def chat_link(self, obj: Feedback):
-        return SafeString(f'<a href="/admin/hsearch/chat/{obj.chat.id}/">{obj.chat}</a>')
+        return SafeString(f'<a href="/hsearch/hsearch/chat/{obj.chat.id}/">{obj.chat}</a>')
 
     chat_link.short_description = 'chat'
 
@@ -250,7 +250,7 @@ class ImageAdmin(admin.ModelAdmin):
     image.short_description = 'image'
 
     def offer_link(self, obj: Feedback):
-        return SafeString(f'<a href="/admin/hsearch/offer/{obj.offer.id}/">{obj.offer}</a>')
+        return SafeString(f'<a href="/hsearch/hsearch/offer/{obj.offer.id}/">{obj.offer}</a>')
 
     offer_link.short_description = 'offer'
 
@@ -284,11 +284,11 @@ class TgMessageAdmin(admin.ModelAdmin):
     ]
 
     def chat_link(self, obj: Feedback):
-        return SafeString(f'<a href="/admin/hsearch/chat/{obj.chat.id}/">{obj.chat}</a>')
+        return SafeString(f'<a href="/hsearch/hsearch/chat/{obj.chat.id}/">{obj.chat}</a>')
 
     chat_link.short_description = 'chat'
 
     def offer_link(self, obj: Feedback):
-        return SafeString(f'<a href="/admin/hsearch/offer/{obj.offer.id}/">{obj.offer}</a>')
+        return SafeString(f'<a href="/hsearch/hsearch/offer/{obj.offer.id}/">{obj.offer}</a>')
 
     offer_link.short_description = 'offer'

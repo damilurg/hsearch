@@ -21,6 +21,8 @@ type (
 		CleanExpiredImages(ctx context.Context, expireDate int64) error
 		CleanExpiredAnswers(ctx context.Context, expireDate int64) error
 		CleanExpiredTGMessages(ctx context.Context, expireDate int64) error
+
+		UpdateSettings(ctx context.Context, chat *structs.Chat) error
 	}
 
 	Bot interface {
@@ -60,16 +62,21 @@ func NewManager(cnf *configs.Config, st Storage, bot Bot) *Manager {
 }
 
 // StartGarbageCollector - runs garbage collection in the form of old records that no longer make sense
-func (m *Manager) StartGarbageCollector(ctx context.Context) {
-	m.garbage(ctx)
+func (m *Manager) StartGarbageCollector() {
+	m.garbage()
 }
 
 // StartGrabber - starts the process of finding new offers
-func (m *Manager) StartGrabber(ctx context.Context) {
-	m.grabber(ctx)
+func (m *Manager) StartGrabber() {
+	m.grabber()
 }
 
 // StartGrabber - starts the search process for chats
-func (m *Manager) StartMatcher(ctx context.Context) {
-	m.matcher(ctx)
+func (m *Manager) StartMatcher() {
+	m.matcher()
+}
+
+// StartApi - starts the HTTP api service
+func (m *Manager) StartApi() {
+	m.httpApi()
 }

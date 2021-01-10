@@ -4,6 +4,9 @@ mod:
 	GO111MODULE=on go mod tidy
 	GO111MODULE=on go mod vendor
 
+update:
+	go get -u ./...
+
 migrate:
 	go run cmd/hsearch/*.go migrate
 

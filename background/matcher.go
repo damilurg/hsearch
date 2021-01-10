@@ -3,6 +3,7 @@ package background
 import (
 	"context"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/getsentry/sentry-go"
@@ -13,7 +14,7 @@ import (
 // todo: refactor this
 // matcher - an intermediary to receive all users and start the mailing list
 //  for them
-func (m *Manager) matcher(ctx context.Context) {
+func (m *Manager) matcher() {
 	sleep := time.Second * 2
 
 	log.Printf("[matcher] StartMatcher Manager\n")
@@ -21,6 +22,7 @@ func (m *Manager) matcher(ctx context.Context) {
 		select {
 		case <-time.After(sleep):
 			sleep = m.cnf.FrequencyTime
+			ctx := context.Background()
 
 			chats, err := m.st.ReadChatsForMatching(ctx, 1)
 			if err != nil {
@@ -68,6 +70,14 @@ func (m *Manager) matching(ctx context.Context, chat *structs.Chat) {
 
 	err = m.bot.SendOffer(ctx, offer, chat.Id)
 	if err != nil {
+		if strings.Contains(err.Error(), "blocked by the user") {
+			chat.Enable = false
+			if err = m.st.UpdateSettings(ctx, chat); err != nil {
+				sentry.CaptureException(err)
+			}
+			return
+		}
+
 		sentry.AddBreadcrumb(&sentry.Breadcrumb{
 			Category: "matcher",
 			Data: map[string]interface{}{

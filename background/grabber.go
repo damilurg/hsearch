@@ -13,7 +13,7 @@ import (
 // todo: refactor this
 // grabber - парсит удаленные ресурсы, находит предложения и пишет в хранилище,
 // после чего трегерит broker
-func (m *Manager) grabber(ctx context.Context) {
+func (m *Manager) grabber() {
 	// при первом запуске менеджера, он начнет первый парсинг через 2 секунды,
 	// а после изменится на время из настроек (sleep = m.cnf.ManagerDelay)
 	sleep := time.Second * 2
@@ -23,6 +23,7 @@ func (m *Manager) grabber(ctx context.Context) {
 		select {
 		case <-time.After(sleep):
 			sleep = m.cnf.FrequencyTime
+			ctx := context.Background()
 
 			for _, site := range m.sitesForParse {
 				go m.grabbedOffers(ctx, site)
