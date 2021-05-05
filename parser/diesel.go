@@ -24,7 +24,7 @@ func DieselSite() *Diesel {
 	return &Diesel{
 		Site:         structs.SiteDiesel,
 		Host:         "http://diesel.elcat.kg",
-		Target:       "http://diesel.elcat.kg/index.php?showforum=305",
+		Target:       "http://diesel.elcat.kg/index.php?showforum=224",
 		MainSelector: ".topic_title",
 	}
 }

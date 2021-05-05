@@ -39,7 +39,7 @@ func LalafoSite() *Lalafo {
 	return &Lalafo{
 		Site:         structs.SiteLalafo,
 		Host:         "https://lalafo.kg",
-		Target:       "https://lalafo.kg/kyrgyzstan/kvartiry/arenda-kvartir/dolgosrochnaya-arenda-kvartir",
+		Target:       "https://lalafo.kg/bishkek/kvartiry/prodazha-kvartir",
 		MainSelector: "#__NEXT_DATA__",
 	}
 }

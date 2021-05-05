@@ -23,7 +23,7 @@ func HouseSite() *House {
 	return &House{
 		Site:         structs.SiteHouse,
 		Host:         "https://www.house.kg",
-		Target:       "https://www.house.kg/snyat-kvartiru?region=1&town=2&rental_term=3&sort_by=upped_at+desc&page=%d",
+		Target:       "https://www.house.kg/kupit-kvartiru?region=1&town=2&sort_by=upped_at+desc",
 		MainSelector: "p.title > a",
 	}
 }
