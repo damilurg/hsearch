@@ -16,7 +16,7 @@ import (
 type Lalafo struct {
 	Site         string
 	Host         string
-	Target       string
+	Target       []string
 	MainSelector string
 }
 
@@ -39,7 +39,7 @@ func LalafoSite() *Lalafo {
 	return &Lalafo{
 		Site:         structs.SiteLalafo,
 		Host:         "https://lalafo.kg",
-		Target:       "https://lalafo.kg/bishkek/kvartiry/prodazha-kvartir",
+		Target:       []string{"https://lalafo.kg/bishkek/kvartiry/prodazha-kvartir"},
 		MainSelector: "#__NEXT_DATA__",
 	}
 }
@@ -52,7 +52,7 @@ func (s *Lalafo) FullHost() string {
 	return s.Host
 }
 
-func (s *Lalafo) Url() string {
+func (s *Lalafo) Url() []string {
 	return s.Target
 }
 

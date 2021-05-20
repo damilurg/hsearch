@@ -7,15 +7,13 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/getsentry/sentry-go"
-
 	"github.com/comov/hsearch/structs"
 )
 
 type House struct {
 	Site         string
 	Host         string
-	Target       string
+	Target       []string
 	MainSelector string
 }
 
@@ -23,7 +21,7 @@ func HouseSite() *House {
 	return &House{
 		Site:         structs.SiteHouse,
 		Host:         "https://www.house.kg",
-		Target:       "https://www.house.kg/kupit-kvartiru?region=1&town=2&sort_by=upped_at+desc",
+		Target:       []string{"https://www.house.kg/kupit-kvartiru"},
 		MainSelector: "p.title > a",
 	}
 }
@@ -36,8 +34,8 @@ func (s *House) FullHost() string {
 	return s.Host
 }
 
-func (s *House) Url() string {
-	return fmt.Sprintf(s.Target, 1)
+func (s *House) Url() []string {
+	return s.Target
 }
 
 func (s *House) Selector() string {
@@ -45,39 +43,43 @@ func (s *House) Selector() string {
 }
 
 func (s *House) GetOffersMap(doc *goquery.Document) OffersMap {
-	var mapResponse = DefaultParser(s, doc)
-
-	var lastPage = 1
-	doc.Find(".page-link[data-page]").Each(func(i int, _s *goquery.Selection) {
-		n, ok := _s.Attr("data-page")
-		nInt, err := strconv.Atoi(n)
-		if err != nil {
-			sentry.CaptureException(err)
-			return
-		}
-
-		if ok && nInt > lastPage {
-			lastPage = nInt
-		}
-	})
-
-	if lastPage == 1 {
-		return mapResponse
-	}
-
-	for i := 2; i <= lastPage; i++ {
-		doc, err := GetDocumentByUrl(fmt.Sprintf(s.Target, i))
-		if err != nil {
-			sentry.CaptureException(err)
-			continue
-		}
-		for id, url := range DefaultParser(s, doc) {
-			mapResponse[id] = url
-		}
-	}
-
-	return mapResponse
+	return OffersMap{}
 }
+
+//func (s *House) GetOffersMap(doc *goquery.Document) OffersMap {
+//	var mapResponse = DefaultParser(s, doc)
+//
+//	var lastPage = 1
+//	doc.Find(".page-link[data-page]").Each(func(i int, _s *goquery.Selection) {
+//		n, ok := _s.Attr("data-page")
+//		nInt, err := strconv.Atoi(n)
+//		if err != nil {
+//			sentry.CaptureException(err)
+//			return
+//		}
+//
+//		if ok && nInt > lastPage {
+//			lastPage = nInt
+//		}
+//	})
+//
+//	if lastPage == 1 {
+//		return mapResponse
+//	}
+//
+//	for i := 2; i <= lastPage; i++ {
+//		doc, err := GetDocumentByUrl(fmt.Sprintf(s.Target, i))
+//		if err != nil {
+//			sentry.CaptureException(err)
+//			continue
+//		}
+//		for id, url := range DefaultParser(s, doc) {
+//			mapResponse[id] = url
+//		}
+//	}
+//
+//	return mapResponse
+//}
 
 // IdFromHref - find offer Id from URL
 func (s *House) IdFromHref(href string) (uint64, error) {
