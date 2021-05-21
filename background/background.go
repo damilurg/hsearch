@@ -34,7 +34,7 @@ type (
 	Site interface {
 		Name() string
 		FullHost() string
-		Url() []string
+		Url() string
 		Selector() string
 
 		GetOffersMap(doc *goquery.Document) parser.OffersMap

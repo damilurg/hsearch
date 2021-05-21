@@ -119,7 +119,7 @@ func LoadOffersDetail(offersList map[uint64]string, site Site) []*structs.Offer 
 	return lo.offers
 }
 
-// GetDocumentByUrl - получает страницу по http, читает и возвращет объект
+// GetDocumentByUrl - получает страницу по http, читает и возвращает объект
 // goquery.Document для парсинга
 func GetDocumentByUrl(url string) (*goquery.Document, error) {
 	res, err := http.Get(url)

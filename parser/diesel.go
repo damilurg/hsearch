@@ -16,20 +16,15 @@ import (
 type Diesel struct {
 	Site         string
 	Host         string
-	Target       []string
+	Target       string
 	MainSelector string
 }
 
 func DieselSite() *Diesel {
 	return &Diesel{
-		Site: structs.SiteDiesel,
-		Host: "http://diesel.elcat.kg",
-		Target: []string{
-			"http://diesel.elcat.kg/index.php?showforum=459",
-			"http://diesel.elcat.kg/index.php?showforum=460",
-			"http://diesel.elcat.kg/index.php?showforum=461",
-			"http://diesel.elcat.kg/index.php?showforum=462",
-		},
+		Site:         structs.SiteDiesel,
+		Host:         "http://diesel.elcat.kg",
+		Target:       "http://diesel.elcat.kg/index.php?showforum=460",
 		MainSelector: ".topic_title",
 	}
 }
@@ -42,7 +37,7 @@ func (s *Diesel) FullHost() string {
 	return s.Host
 }
 
-func (s *Diesel) Url() []string {
+func (s *Diesel) Url() string {
 	return s.Target
 }
 
